@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 import aiosqlite
 from aiogram import Router
 
+from speech_functions import *
 from states import TaskUpdate
 
 update_task = Router()
@@ -14,24 +15,30 @@ async def update_task_cmd(message: Message, state: FSMContext):
     user_id = message.from_user.id
     async with aiosqlite.connect('users.db') as db:
       async with db.execute("SELECT id, task, date, time, status FROM tasks WHERE user_id=? and status not like('Выполнено')", (user_id,)) as cursor:
-        tasks = cursor.fetchall()
+        tasks = await cursor.fetchall()
 
         if not tasks:
-            await message.answer("У вас пока нет задач.")
+            text = 'You have no tasks.'
+            text = await language_text(user_id, text)
+            await message.answer(text)
             return
 
-        response = "Ваши задачи:\n"
+        response = "Your tasks:\n"
         for task_id, task, date, time, status in tasks:
-            response += f"{task_id}. {task} (Дата: {date}, Время: {time}, Статус: {status})\n"
+            response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
 
-        await message.answer(response + "Введите ID задачи, которую хотите обновить:")
+        response += "Enter the ID of task which you want to update:"
+        response = await language_text(user_id, response)
+        await message.answer(response)
         await state.set_state(TaskUpdate.waiting_for_task_id)
 
 @update_task.message(TaskUpdate.waiting_for_task_id)
 async def process_task_id(message: Message, state: FSMContext):
     task_id = message.text
     if not task_id.isdigit():
-        await message.answer("Пожалуйста, введите числовой ID задачи.")
+        text = 'Please, enter thr integer ID of task.'
+        text = await language_text(message.from_user.id, text)
+        await message.answer(text)
         return
 
     await state.update_data(task_id=task_id)

@@ -4,6 +4,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
+from speech_functions import *
 from states import Question, DeadlineCreation
 
 
@@ -11,13 +12,17 @@ add_deadline = Router()
 
 @add_deadline.message(Command("add_deadline"))
 async def add_task_cmd(message: Message, state: FSMContext):
-  await message.answer("Введите название дэдлайна:")
+  text = 'Enter the name of the deadline:'
+  text = await language_text(message.from_user.id, text)
+  await message.answer(text)
   await state.set_state(DeadlineCreation.waiting_for_deadline)
 
 @add_deadline.message(DeadlineCreation.waiting_for_deadline)
 async def process_task(message: Message, state: FSMContext):
   await state.update_data(deadline=message.text)
-  await message.answer("Выберите дату, когда истекает срок дэдлайна")
+  text = 'Choose the date on wich the term expires'
+  text = await language_text(message.from_user.id, text)
+  await message.answer(text)
   await state.set_state(DeadlineCreation.waiting_for_date)
 
 @add_deadline.message(DeadlineCreation.waiting_for_date)
@@ -25,7 +30,6 @@ async def process_date(message: Message, state: FSMContext):
   # здесь должен быть календарь Феди
   # await message.answer('Введите время в формате HH:MM')
   await state.set_state(DeadlineCreation.waiting_for_time)
-  pass
 
 #Это будет функция коллбэка на выбранную дату для выбора времени
 @add_deadline.message(DeadlineCreation.waiting_for_time)

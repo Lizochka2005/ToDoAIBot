@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 import aiosqlite
 
 from states import Question, GetTaskListForDate
-
+from speech_functions import *
 
 from aiogram import Router
 
@@ -14,7 +14,9 @@ my_tasks_for_date = Router()
 
 @my_tasks_for_date.message(Command("my_tasks_for_date"))
 async def ask_for_date(message: Message, state: FSMContext):
-    await message.answer("Введите дату в формате YYYY-MM-DD")
+    text = 'Enter the date in format YYYY-MM-DD'
+    text = await language_text(message.from_user.id, text)
+    await message.answer(text)
     await state.set_state(GetTaskListForDate.waiting_for_date)
 
 
@@ -31,13 +33,19 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
             or len(a[2]) != 2
             or a[0][:1] == 0
         ):
-            await message.answer("Некорректно введена дата, попробуйте ещё раз!")
+            text = 'Incorrect date, please try again!'
+            text = await language_text(user_id, text)
+            await message.answer(text)
             return
         elif (a[1][:1] != 0 and int(a[1]) > 12) or (a[2][:1] != 0 and a[2] > 31):
-            await message.answer("Некорректно введена дата, попробуйте ещё раз!")
+            text = 'Incorrect date, please try again!'
+            text = await language_text(user_id, text)
+            await message.answer(text)
             return
     except Exception as e:
-        await message.answer("Некорректно введена дата, попробуйте ещё раз!")
+        text = 'Incorrect date, please try again!'
+        text = await language_text(user_id, text)
+        await message.answer(text)
         return
 
     async with aiosqlite.connect("users.db") as db:
@@ -48,14 +56,16 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
                 date,
             ),
         ) as cursor:
-            tasks = cursor.fetchall()
+            tasks = await cursor.fetchall()
 
             if not tasks:
                 await message.answer(f"У вас нет задач на {date}.")
                 return
 
-            response = f"Ваши задачи на {date}:\n"
+            response = f"Your tasks on {date}:\n"
             for task, status, date, time in tasks:
-                response += f"- {task} (Статус: {status}, Время: {time})\n"
+                response += f"- {task} (Status: {status}, Time: {time})\n"
+            
+            response = await language_text(user_id, response)
             await message.answer(response)
             # await state.set_state(Start.question)

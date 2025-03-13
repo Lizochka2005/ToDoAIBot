@@ -8,6 +8,7 @@ from aiogram.filters import Command
 from states import Question
 from initialisation import llm
 import keyboards as kb
+from speech_functions import *
 
 
 answer_question = Router()
@@ -15,7 +16,9 @@ answer_question = Router()
 
 @answer_question.message(Command("answer_question"))
 async def user_question(message: Message, state: FSMContext):
-    await message.answer("Готов ответить на твой вопрос!")
+    text = 'Ready to answer your question!'
+    text = await language_text(message.from_user.id, text)
+    await message.answer(text)
     await state.set_state(Question.question)
 
 
@@ -33,9 +36,13 @@ async def llm_answer(message: Message, state: FSMContext):
         await state.update_data(answer_en=ans)
         await state.update_data(lan="en")
         print("Ответ получен")
-        await message.answer(ans, reply_markup=kb.say_and_translate)
-
+        ans = await language_text(message.from_user.id, ans)
+        if await check_language_ru(message.from_user.id):
+            await message.answer(ans, reply_markup=kb.say_ru)
+        else:
+            await message.answer(ans, reply_markup=kb.say_en)
+        
     except Exception as e:
         print(f"Произошла ошибка: {e}")
-    await message.answer("Выбери команду")
+        return
 

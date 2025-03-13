@@ -4,14 +4,16 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram import Router
 
-
+from speech_functions import *
 from states import TaskCreation, Question
 
 add_task = Router()
 
 @add_task.message(Command("add_task"))
 async def add_task_cmd(message: Message, state: FSMContext):
-  await message.answer("Введите задачу:")
+  text = 'Enter task:'
+  text = await language_text(message.from_user.id, text)
+  await message.answer(text)
   await state.set_state(TaskCreation.waiting_for_task)
 
 #Эту функцию будем использовать в качестве коллбэка на кнопку под задачей, после присылания уведомления о начале времени задачи
@@ -25,7 +27,9 @@ async def add_task_cmd(message: Message, state: FSMContext):
 @add_task.message(TaskCreation.waiting_for_task)
 async def process_task(message: Message, state: FSMContext):
   await state.update_data(task=message.text)
-  await message.answer("Выберите дату, на которую хотите поставить выполнение задачи")
+  text = 'Choose the date you want to complete the task'
+  text = await language_text(message.from_user.id, text)
+  await message.answer(text)
   await state.set_state(TaskCreation.waiting_for_date)
 
 @add_task.message(TaskCreation.waiting_for_date)

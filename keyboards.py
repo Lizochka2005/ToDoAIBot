@@ -2,12 +2,24 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
+say_en = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Voice 🎤", callback_data="Озвучить"),
+        ],
+        [
+            InlineKeyboardButton(
+                text="Stop answering questions",
+                callback_data="Остановить ответы на вопросы",
+            )
+        ],
+    ]
+)
 
-say_and_translate = InlineKeyboardMarkup(
+say_ru = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="Озвучить 🎤", callback_data="Озвучить"),
-            InlineKeyboardButton(text="Перевести 🌐", callback_data="Перевести"),
         ],
         [
             InlineKeyboardButton(
@@ -17,6 +29,21 @@ say_and_translate = InlineKeyboardMarkup(
         ],
     ]
 )
+
+# say_and_translate = InlineKeyboardMarkup(
+#     inline_keyboard=[
+#         [
+#             InlineKeyboardButton(text="Озвучить 🎤", callback_data="Озвучить"),
+#             InlineKeyboardButton(text="Перевести 🌐", callback_data="Перевести"),
+#         ],
+#         [
+#             InlineKeyboardButton(
+#                 text="Остановить ответы на вопросы",
+#                 callback_data="Остановить ответы на вопросы",
+#             )
+#         ],
+#     ]
+# )
 
 
 commands = [
@@ -31,9 +58,16 @@ commands = [
 ]
 
 
-def show_commands():
+def show_commands_ru():
     # вывод команд бота
     bot_commands = "У бота есть команды:\n"
+    for command in commands:
+        bot_commands += "/" + command + "\n"
+    return bot_commands
+
+def show_commands_en():
+    # вывод команд бота
+    bot_commands = "Bot has commands:\n"
     for command in commands:
         bot_commands += "/" + command + "\n"
     return bot_commands

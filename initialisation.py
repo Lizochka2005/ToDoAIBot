@@ -5,7 +5,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from langchain_groq import ChatGroq
 import os
 
-os.environ["GROQ_API_KEY"] = "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"
+os.environ["GROQ_API_KEY"] = "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"
 
 llm = ChatGroq(model="llama3-70b-8192")
 

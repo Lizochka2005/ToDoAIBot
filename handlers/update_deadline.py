@@ -7,6 +7,7 @@ import aiosqlite
 from aiogram import Router
 
 from states import DeadlineUpdate
+from speech_functions import *
 
 update_deadline = Router()
 
@@ -15,24 +16,30 @@ async def update_deadline_cmd(message: Message, state: FSMContext):
     user_id = message.from_user.id
     async with aiosqlite.connect('users.db') as db:
       async with db.execute("SELECT id, deadline, date, time, status FROM deadlines WHERE user_id=? and status not like('Завершён')", (user_id,)) as cursor:
-        deadlines = cursor.fetchall()
+        deadlines = await cursor.fetchall()
 
         if not deadlines:
-            await message.answer("У вас нет дэдлайнов.")
+            text = 'You have no deadlines.'
+            text = await language_text(user_id, text)
+            await message.answer(text)
             return
 
-        response = "Ваши дэдлайны:\n"
+        response = "Your deadlines:\n"
         for deadline_id, deadline, date, time, status in deadlines:
-            response += f"{deadline_id}. {deadline} (Дата: {date}, Время: {time}, Статус: {status})\n"
+            response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
 
-        await message.answer(response + "Введите ID дэдлайна, который хотите обновить:")
+        response += "Enter the ID of deadline which you want to update:"
+        response = await language_text(user_id, response)
+        await message.answer(response)
         await state.set_state(DeadlineUpdate.waiting_for_deadline_id)
 
 @update_deadline.message(DeadlineUpdate.waiting_for_deadline_id)
 async def process_task_id(message: Message, state: FSMContext):
     deadline_id = message.text
     if not deadline_id.isdigit():
-        await message.answer("Пожалуйста, введите числовой ID дэдлайна.")
+        text = "Please, enter thr integer ID of deadline."
+        text = await language_text(message.from_user.id, text)
+        await message.answer(text)
         return
 
     await state.update_data(deadline_id=deadline_id)

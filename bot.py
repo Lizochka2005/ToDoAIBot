@@ -31,7 +31,7 @@ from handlers.start import start
 from handlers.update_deadline import update_deadline
 from handlers.update_task import update_task
 from handlers.callbacks import callbacks
-from handlers.answer_voice_message import answer_voice_message
+# from handlers.answer_voice_message import answer_voice_message
 from handlers.default_handler import default_handler
 from handlers.answer_question import answer_question
 from initialisation import llm, bot, dp
@@ -50,7 +50,7 @@ async def main():
     dp.include_router(update_deadline)
     dp.include_router(update_task)
     dp.include_router(callbacks)
-    dp.include_router(answer_voice_message)
+    # dp.include_router(answer_voice_message)
     dp.include_router(default_handler)
 
     dp.startup.register(start_db)

@@ -4,7 +4,7 @@ from aiogram.types import Message, FSInputFile
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 import aiosqlite
-
+from speech_functions import *
 
 from states import Registration, Question
 import keyboards as kb
@@ -22,24 +22,32 @@ async def start_cmd(message: Message, state: FSMContext):
         ) as cursor:
             user = await cursor.fetchone()
             if user is None:
-                await message.answer("Привет! Как тебя зовут?")
+                await message.answer("Hi! What is your name?")
                 await state.set_state(Registration.waiting_for_name)
             else:
-                await message.answer(f"Привет, {user[0]}! Ты уже зарегистрирован.")
-                await message.answer(kb.show_commands())
+                text = f"Hi, {user[0]}! You are already registered."
+                text = await language_text(user_id, text)
+                await message.answer(text)
+                if await check_language_ru(message.from_user.id):
+                    await message.answer(kb.show_commands_ru())
+                    await state.clear()
+                else:
+                    await message.answer(kb.show_commands_en())
+                    await state.clear()
+
 
 
 @start.message(Registration.waiting_for_name)
 async def process_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
-    await message.answer("Какой язык предпочитаешь? (ru/en)")
+    await message.answer("What language do you prefer? (ru/en)")
     await state.set_state(Registration.waiting_for_language)
 
 
 @start.message(Registration.waiting_for_language)
 async def process_language(message: Message, state: FSMContext):
     if message.text.lower() not in ["ru", "en"]:
-        await message.answer("Пожалуйста, выбери ru или en.")
+        await message.answer("Please, choose 'ru' or 'en'.")
         return
 
     user_data = await state.get_data()
@@ -54,5 +62,12 @@ async def process_language(message: Message, state: FSMContext):
         )
         await db.commit()
 
-    await message.answer(f"Регистрация завершена! Имя: {name}, Язык: {language}")
-    await message.answer(kb.show_commands())
+    text = f"Registration completed! Name: {name}, Language: {language}"
+    text = await language_text(user_id, text)
+    await message.answer(text)
+    if await check_language_ru(message.from_user.id):
+        await message.answer(kb.show_commands_ru())
+        await state.clear()
+    else:
+        await message.answer(kb.show_commands_en())
+        await state.clear()
