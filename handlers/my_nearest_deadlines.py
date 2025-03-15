@@ -4,7 +4,7 @@ from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import Message, FSInputFile
 import aiosqlite
 
-from states import Question
+from states import Question, Registration
 from speech_functions import *
 
 
@@ -12,7 +12,7 @@ from speech_functions import *
 my_nearest_deadlines = Router()
 
 
-@my_nearest_deadlines.message(Command("my_nearest_deadlines"))
+@my_nearest_deadlines.message(Command("my_nearest_deadlines"), Registration.confirmed)
 async def show_tasks_for_today(message: Message):
     user_id = message.from_user.id
     async with aiosqlite.connect('users.db') as db:

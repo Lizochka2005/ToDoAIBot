@@ -5,12 +5,12 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
 from speech_functions import *
-from states import Question, DeadlineCreation
+from states import Question, DeadlineCreation, Registration
 
 
 add_deadline = Router()
 
-@add_deadline.message(Command("add_deadline"))
+@add_deadline.message(Command("add_deadline"), Registration.confirmed)
 async def add_task_cmd(message: Message, state: FSMContext):
   text = 'Enter the name of the deadline:'
   text = await language_text(message.from_user.id, text)
@@ -47,5 +47,5 @@ async def process_time(message: Message, state: FSMContext):
   #   await message.answer('Некорректно введено время, попробуйте ещё раз!')
   #   return
   # await message.answer(f"Дэдлайн добавлен!\nДэдлайн: {deadline}\nДата: {date}\nВремя: {time}")
-  # await state.set_state(Start.question)
+  # await state.set_state(Registration.confirmed)
   pass

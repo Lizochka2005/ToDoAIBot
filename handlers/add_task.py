@@ -5,11 +5,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram import Router
 
 from speech_functions import *
-from states import TaskCreation, Question
+from states import TaskCreation, Question, Registration
 
 add_task = Router()
 
-@add_task.message(Command("add_task"))
+@add_task.message(Command("add_task"), Registration.confirmed)
 async def add_task_cmd(message: Message, state: FSMContext):
   text = 'Enter task:'
   text = await language_text(message.from_user.id, text)
@@ -43,5 +43,5 @@ async def process_date(message: Message, state: FSMContext):
 async def process_time(message: Message, state: FSMContext):
   # здесь должен быть календарь Феди
   # await message.answer(f"Задача добавлена!\nЗадача: {task}\nДата: {date}\nВремя: {time}")
-  # await state.set_state(Start.question)
+  # await state.set_state(Registration.confirmed)
   pass

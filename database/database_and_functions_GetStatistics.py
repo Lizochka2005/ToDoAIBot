@@ -7,7 +7,8 @@ async def start_db():
         await db.execute('''CREATE TABLE IF NOT EXISTS users (
                         user_id INTEGER PRIMARY KEY,
                         name TEXT,
-                        language TEXT)''')
+                        language TEXT,
+                        subscribed BOOLEAN DEFAULT TRUE)''')
         await db.execute('''CREATE TABLE IF NOT EXISTS tasks (
                       id INTEGER PRIMARY KEY AUTOINCREMENT,
                       user_id INTEGER,
@@ -34,10 +35,12 @@ async def get_daily_stats(user_id: int):
       today = datetime.date.today().strftime("%Y-%m-%d")
       # Считаем общее количество задач за сегодня
       async with db.execute("SELECT COUNT(*) FROM tasks WHERE user_id = ? AND date = ?", (user_id, today)) as cursor:
-        total_tasks = cursor.fetchone()[0] or 0
+        total_tasks = await cursor.fetchone()
+        total_tasks = total_tasks[0] or 0
 
       # Считаем количество выполненных задач за сегодня
-      async with db.execute("SELECT COUNT(*) FROM tasks WHERE user_id = ? AND date = ? AND status = ?", (user_id, today, "выполнено")) as cursor:
-        completed_tasks = cursor.fetchone()[0] or 0
+      async with db.execute("SELECT COUNT(*) FROM tasks WHERE user_id = ? AND date = ? AND status = ?", (user_id, today, "Выполнено")) as cursor:
+        completed_tasks = await cursor.fetchone()
+        completed_tasks = total_tasks[0] or 0
 
     return total_tasks, completed_tasks

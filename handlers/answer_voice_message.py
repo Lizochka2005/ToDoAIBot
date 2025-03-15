@@ -4,13 +4,14 @@ import os
 from aiogram import F
 
 from initialisation import bot
-from speech_functions import recognize_speech
+from speech_functions import recognize_speech, language_text
+from states import Registration
 
 answer_voice_message = Router()
 
 
 # Хэндлер для обработки голосовых сообщений
-@answer_voice_message.message(F.voice)
+@answer_voice_message.message(F.voice, Registration.confirmed)
 async def voice_handler(message: types.Message):
     voice = message.voice
     file = await bot.get_file(voice.file_id)
@@ -26,11 +27,17 @@ async def voice_handler(message: types.Message):
 
         # Отправка распознанного текста
         if text:
-            await message.answer(f"🎤 Распознанный текст:\n\n{text}")
+            answ = 'Recognized text:'
+            answ = language_text(message.from_user.id, answ)
+            await message.answer(f"🎤 {answ}\n\n{text}")
         else:
-            await message.answer("❌ Не удалось распознать речь. Попробуйте еще раз.")
+            answ = 'Failed to recognize speech. Try again.'
+            answ = language_text(message.from_user.id, answ)
+            await message.answer(f"❌ {answ}")
     except Exception as e:
-        await message.answer(f"⚠ Ошибка обработки аудио: {str(e)}")
+        answ = 'Error processing of audio:'
+        answ = language_text(message.from_user.id, answ)
+        await message.answer(f"⚠ {answ} {str(e)}")
     finally:
         # Удаление загруженного файла
         os.remove(local_filename)

@@ -5,7 +5,7 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from aiogram.filters import Command
 
-from states import Question
+from states import Question, Registration
 from initialisation import llm
 import keyboards as kb
 from speech_functions import *
@@ -14,7 +14,7 @@ from speech_functions import *
 answer_question = Router()
 
 
-@answer_question.message(Command("answer_question"))
+@answer_question.message(Command("answer_question"), Registration.confirmed)
 async def user_question(message: Message, state: FSMContext):
     text = 'Ready to answer your question!'
     text = await language_text(message.from_user.id, text)
@@ -39,10 +39,13 @@ async def llm_answer(message: Message, state: FSMContext):
         ans = await language_text(message.from_user.id, ans)
         if await check_language_ru(message.from_user.id):
             await message.answer(ans, reply_markup=kb.say_ru)
+            await state.set_state(Registration.confirmed)
         else:
             await message.answer(ans, reply_markup=kb.say_en)
+            await state.set_state(Registration.confirmed)
         
     except Exception as e:
         print(f"Произошла ошибка: {e}")
+        await state.set_state(Registration.confirmed)
         return
 

@@ -2,7 +2,7 @@ from gtts import gTTS
 import os
 from googletrans import Translator
 import asyncio
-# import whisper
+import whisper
 import aiosqlite
 
 
@@ -22,10 +22,20 @@ async def translate_text(text):
         print("Переводчик не робит :(")
         print(f"Произошла ошибка: {e}")
 
-# async def recognize_speech(audio_path, language="ru"):
-#     model = whisper.load_model("base")
-#     result = model.transcribe(audio_path, language=language)
-#     return result["text"].strip()
+
+async def translate_text_to_en(text):
+    translator = Translator()
+    try:
+        out_text = await translator.translate(text)
+        return out_text.text
+    except Exception as e:
+        print("Переводчик не робит :(")
+        print(f"Произошла ошибка: {e}")
+
+async def recognize_speech(audio_path, language="ru"):
+    model = whisper.load_model("base")
+    result = model.transcribe(audio_path, language=language)
+    return result["text"].strip()
 
 async def language_text(user_id, text):
     async with aiosqlite.connect("users.db") as db:
