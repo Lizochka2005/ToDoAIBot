@@ -100,7 +100,7 @@ async def update_task_date(call: CallbackQuery, state: FSMContext):
 async def update_deadline_date(call: CallbackQuery):
     text = 'Enter new status for the deadline:'
     text = await language_text(call.message.from_user.id, text)
-    if check_language_ru(Message.from_user.id):
+    if await check_language_ru(Message.from_user.id):
         await call.message.answer(text, reply_markup=kb.update_status_deadline_ru)
     else:
         await call.message.answer(text, reply_markup=kb.update_status_deadline_en)
@@ -109,7 +109,7 @@ async def update_deadline_date(call: CallbackQuery):
 async def update_task_date(call: CallbackQuery):
     text = 'Enter new status for the task:'
     text = await language_text(call.message.from_user.id, text)
-    if check_language_ru(Message.from_user.id):
+    if await check_language_ru(Message.from_user.id):
         await call.message.answer(text, reply_markup=kb.update_status_task_ru)
     else:
         await call.message.answer(text, reply_markup=kb.update_status_task_en)
@@ -244,3 +244,31 @@ async def update_task_status_not_completed(call: CallbackQuery, state: FSMContex
         response = await language_text(user_id, response)
         await call.message.answer(response)
         await state.set_state(Registration.confirmed)
+
+@callbacks.callback_query(EditProfile.waiting_for_choice, F.data.in_(["edit_name", "edit_language"]))
+async def process_edit_choice(call: CallbackQuery, state: FSMContext):
+    choice = call.data
+    if choice == "edit_name":
+        text = 'Enter new name:'
+        text = await language_text(call.message.from_user.id, text)
+        await call.message.answer(text)
+        await state.set_state(EditProfile.waiting_for_name)
+    elif choice == "edit_language":
+        user_id = call.from_user.id
+        async with aiosqlite.connect('users.db') as db:
+            async with db.execute("SELECT language FROM users WHERE user_id=?", (user_id,)) as cursor:
+                user_data = await cursor.fetchone()
+                if user_data:
+                    current_language = user_data[0]
+                    new_language = "ru" if current_language == "en" else "en"
+                    await db.execute("UPDATE users SET language=? WHERE user_id=?", (new_language, user_id))
+                    await db.commit()
+                    text = 'Language successfully changed to'
+                    text = await language_text(user_id, text)
+                    await call.message.answer(text + ' ' + new_language+'.')
+                    await state.clear()
+                else:
+                    text = 'Profile is not found.'
+                    text = await language_text(user_id, text)
+                    await call.message.answer(text)
+    await call.answer()

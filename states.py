@@ -37,3 +37,7 @@ class DeadlineUpdate(StatesGroup):
 class GetTaskListForDate(StatesGroup):
     waiting_for_date = State()
 
+class EditProfile(StatesGroup):
+    waiting_for_choice = State()
+    waiting_for_name = State()
+    waiting_for_language = State()

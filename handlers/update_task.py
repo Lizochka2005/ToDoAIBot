@@ -45,7 +45,7 @@ async def process_task_id(message: Message, state: FSMContext):
     await state.update_data(task_id=task_id)
     text = 'Choose what you want to update:'
     text = await language_text(message.from_user.id, text)
-    if check_language_ru(message.from_user.id):
+    if await check_language_ru(message.from_user.id):
         await message.answer(text, reply_markup=kb.update_task_ru)
     else:
         await message.answer(text, reply_markup=kb.update_task_ru)

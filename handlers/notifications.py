@@ -13,7 +13,7 @@ notifications = Router()
 # async def setNotifications(message: Message):
 #     text = 'Would you like to receive daily reminders?'
 #     text = language_text(message.from_user.id, text)
-#     if check_language_ru(message.from_user.id):
+#     if await check_language_ru(message.from_user.id):
 #         await message.answer(text, reply_markup=kb.setNotifications_ru,)
 #     else:
 #         await message.answer(text, reply_markup=kb.setNotifications_en,)

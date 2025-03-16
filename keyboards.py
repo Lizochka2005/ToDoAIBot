@@ -57,7 +57,8 @@ commands = [
     "update_deadline",
     "update_task",
     "notifications_on",
-    "notifications_off"
+    "notifications_off",
+    "edit_profile"
 ]
 
 
@@ -130,3 +131,13 @@ update_status_deadline_ru = InlineKeyboardBuilder()
 update_status_deadline_ru.add(InlineKeyboardButton(text="Завершён", callback_data="completed deadline"))
 update_status_deadline_ru.add(InlineKeyboardButton(text="Не завершён", callback_data="not completed deadline"))
 update_status_deadline_ru = update_status_deadline_ru.adjust(2).as_markup()
+
+edit_profile_ru = InlineKeyboardBuilder()
+edit_profile_ru.add(InlineKeyboardButton(text="Имя", callback_data="edit_name"))
+edit_profile_ru.add(InlineKeyboardButton(text="Язык", callback_data="edit_language"))
+edit_profile_ru = edit_profile_ru.adjust(2).as_markup()
+
+edit_profile_en = InlineKeyboardBuilder()
+edit_profile_en.add(InlineKeyboardButton(text="Name", callback_data="edit_name"))
+edit_profile_en.add(InlineKeyboardButton(text="Language", callback_data="edit_language"))
+edit_profile_en = edit_profile_en.adjust(2).as_markup()

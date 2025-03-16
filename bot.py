@@ -34,11 +34,11 @@ from handlers.callbacks import callbacks
 from handlers.answer_voice_message import answer_voice_message
 from handlers.default_handler import default_handler
 from handlers.answer_question import answer_question
+from handlers.edit_profile import edit_profile
+from handlers.notifications import notifications
 from initialisation import llm, bot, dp
 import keyboards as kb
-
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
+from set_scheduler import *
 
 async def main():
 
@@ -54,6 +54,10 @@ async def main():
     dp.include_router(callbacks)
     dp.include_router(answer_voice_message)
     dp.include_router(default_handler)
+    dp.include_router(edit_profile)
+    dp.include_router(notifications)
+
+    setup_scheduler()
 
     dp.startup.register(start_db)
     try:

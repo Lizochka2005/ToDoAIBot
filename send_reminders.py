@@ -2,6 +2,7 @@ import aiosqlite
 from initialisation import bot
 from datetime import datetime, timedelta
 from speech_functions import *
+import keyboards as kb
 
 
 date = datetime.today().date()
@@ -83,7 +84,11 @@ async def send_reminders_task(diff = 0):
                         response += f"- {task} (Status: {status}, Time: {time})\n"
 
                     response = await language_text(user_id, response)
-                    await bot.answer(response)
+                    if diff == 0:
+                        if await check_language_ru(user_id):
+                            await bot.send_message(response,reply_markup=kb.update_status_task_ru)
+                        else:
+                            await bot.send_message(response,reply_markup=kb.update_status_task_en)
 
 async def send_reminders_deadline(diff = 0):
     async with aiosqlite.connect("users.db") as db:
@@ -109,4 +114,33 @@ async def send_reminders_deadline(diff = 0):
                         response += f"- {deadline} (Status: {status}, Time: {time})\n"
 
                     response = await language_text(user_id, response)
-                    await bot.answer(response)
+                    if diff == 0:
+                        if await check_language_ru(user_id):
+                            await bot.send_message(response,reply_markup=kb.update_deadline_ru)
+                        else:
+                            await bot.send_message(response,reply_markup=kb.update_deadline_en)
+
+# Функция для отправки уведомлений утром списком
+async def send_morning_reminders():
+    await send_reminders_task_day_list()
+    await send_reminders_deadline_day_list()
+
+# Функция для отправки уведомлений за час до начала задачи
+async def send_reminders_1_hour_before():
+    await send_reminders_task(60)
+    await send_reminders_deadline(60)
+
+# Функция для отправки уведомлений за 30 минут до начала задачи
+async def send_reminders_30_minutes_before():
+    await send_reminders_task(30)
+    await send_reminders_deadline(30)
+
+# Функция для отправки уведомлений за 15 минут до начала задачи
+async def send_reminders_15_minutes_before():
+    await send_reminders_task(15)
+    await send_reminders_deadline(15)
+
+# Функция для отправки уведомлений в момент начала задачи
+async def send_reminders_at_start():
+    await send_reminders_task(0)
+    await send_reminders_deadline(0)
