@@ -65,9 +65,9 @@ async def voice_handler(message: Message, state: FSMContext):
     try:
         # Распознавание речи
         if await check_language_ru(message.from_user.id):
-            text = recognize_speech(local_filename, 'ru')
+            text = await recognize_speech(local_filename, 'ru')
         else:
-            text = recognize_speech(local_filename, 'en')
+            text = await recognize_speech(local_filename, 'en')
 
         # Отправка распознанного текста
         if text:
@@ -96,12 +96,14 @@ async def voice_handler(message: Message, state: FSMContext):
                 return
         else:
             answ = 'Failed to recognize speech. Try again.'
-            answ = language_text(message.from_user.id, answ)
+            answ = await language_text(message.from_user.id, answ)
             await message.answer(f"❌ {answ}")
+            await state.set_state(Registration.confirmed)
     except Exception as e:
         answ = 'Error processing of audio:'
-        answ = language_text(message.from_user.id, answ)
+        answ = await language_text(message.from_user.id, answ)
         await message.answer(f"⚠ {answ} {str(e)}")
+        await state.set_state(Registration.confirmed)
     finally:
         # Удаление загруженного файла
         os.remove(local_filename)

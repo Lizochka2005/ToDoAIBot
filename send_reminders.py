@@ -6,7 +6,7 @@ import keyboards as kb
 
 
 date = datetime.today().date()
-curr_time = datetime.now().time()
+curr_time = datetime.now()
 
 async def send_reminders_task_day_list():
     async with aiosqlite.connect("users.db") as db:

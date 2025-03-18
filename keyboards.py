@@ -7,12 +7,12 @@ say_en = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(text="Voice 🎤", callback_data="Озвучить"),
         ],
-        [
-            InlineKeyboardButton(
-                text="Stop answering questions",
-                callback_data="Остановить ответы на вопросы",
-            )
-        ],
+        # [
+        #     InlineKeyboardButton(
+        #         text="Stop answering questions",
+        #         callback_data="Остановить ответы на вопросы",
+        #     )
+        # ],
     ]
 )
 
@@ -21,12 +21,12 @@ say_ru = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(text="Озвучить 🎤", callback_data="Озвучить"),
         ],
-        [
-            InlineKeyboardButton(
-                text="Остановить ответы на вопросы",
-                callback_data="Остановить ответы на вопросы",
-            )
-        ],
+        # [
+        #     InlineKeyboardButton(
+        #         text="Остановить ответы на вопросы",
+        #         callback_data="Остановить ответы на вопросы",
+        #     )
+        # ],
     ]
 )
 

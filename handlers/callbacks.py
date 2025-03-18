@@ -63,11 +63,11 @@ async def send_voice(call: CallbackQuery, state: FSMContext):
         print("Голосовое хуйня, не отправилось")
 
 
-@callbacks.callback_query(lambda callback: callback.data == "Остановить ответы на вопросы")
-async def stop_answering(call: CallbackQuery):
-    text = 'Neuro-network no longer answers questions. Choose the option.'
-    text = await language_text(call.message.from_user.id, text)
-    await call.message.answer(text)
+# @callbacks.callback_query(lambda callback: callback.data == "Остановить ответы на вопросы")
+# async def stop_answering(call: CallbackQuery, state: FSMContext):
+#     text = 'Neuro-network no longer answers questions. Choose the option.'
+#     text = await language_text(call.message.from_user.id, text)
+#     await call.message.answer(text)
 
 @callbacks.callback_query(lambda callback: callback.data == "время задача")
 async def update_task_time(call: CallbackQuery, state: FSMContext):

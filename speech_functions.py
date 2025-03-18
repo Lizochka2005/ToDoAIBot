@@ -6,10 +6,11 @@ from translate import Translator
 import asyncio
 import whisper
 # import speech_recognition as sr
+# from pydub import AudioSegment
 import aiosqlite
 
 
-# def text_to_speech(text, lang):
+# def text_to_speech(text, lang):ЫЫ
 #     res = gTTS(text=text, lang=lang)
 #     filename = "output.mp3"
 #     res.save(filename)
@@ -63,17 +64,22 @@ async def recognize_speech(audio_path, language="ru"):
 # async def recognize_speech(audio_path, language):
 #     recognizer = sr.Recognizer()
     
-#     # Загрузка аудиофайла
-#     with sr.AudioFile(audio_path) as source:
-#         audio = recognizer.record(source)  # Чтение аудиофайла
+#     # Загрузка аудиофайла с помощью pydub
+#     audio = AudioSegment.from_file(audio_path)
+#     audio.export("temp.wav", format="wav") 
+    
 #     try:
-#         # Распознавание речи с использованием Google Web Speech API
-#         text = recognizer.recognize_google(audio, language=language)
-#         return text.strip()
+#          # Загрузка аудиофайла
+#         with sr.AudioFile("temp.wav") as source:
+#             audio_data = recognizer.record(source)
+#             text = recognizer.recognize_google(audio_data, language=language)  
+#             return text.strip()
 #     except sr.UnknownValueError:
 #         return "Речь не распознана"
 #     except sr.RequestError as e:
 #         return f"Ошибка запроса к сервису распознавания речи: {e}"
+#     except Exception as e:
+#         return f"Произошла ошибка: {e}"
 
 async def language_text(user_id, text):
     async with aiosqlite.connect("users.db") as db:
