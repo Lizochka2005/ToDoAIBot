@@ -48,4 +48,4 @@ async def process_new_name(message: Message, state: FSMContext):
     text = 'Name successfully changed to'
     text = await language_text(user_id, text)
     await message.answer(text + ' ' + safe_name +'.')
-    await state.clear()
+    await state.set_state(Registration.confirmed)

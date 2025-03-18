@@ -31,14 +31,14 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
             or len(a[0]) != 4
             or len(a[1]) != 2
             or len(a[2]) != 2
-            or a[0][:1] == 0
+            or int(a[0][:1]) == 0
         ):
             text = 'Incorrect date, please try again!'
             text = await language_text(user_id, text)
             await message.answer(text)
             await state.set_state(Registration.confirmed)
             return
-        elif (a[1][:1] != 0 and int(a[1]) > 12) or (a[2][:1] != 0 and a[2] > 31):
+        elif (int(a[1][:1]) != 0 and int(a[1]) > 12) or (int(a[2][:1]) != 0 and int(a[2]) > 31):
             text = 'Incorrect date, please try again!'
             text = await language_text(user_id, text)
             await message.answer(text)
@@ -65,11 +65,12 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
                 text = f'You have no tasks on {date}'
                 text = await language_text(user_id, text)
                 await message.answer(text)
+                await state.set_state(Registration.confirmed)
                 return
 
             response = f"Your tasks on {date}:\n"
             for task, status, date, time in tasks:
-                status = await language_text_to_en(user_id, status)
+                status = await translate_text_to_en(user_id, status)
                 response += f"- {task} (Status: {status}, Time: {time})\n"
             
             response = await language_text(user_id, response)

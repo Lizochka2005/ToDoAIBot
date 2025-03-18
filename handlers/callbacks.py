@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 import os
 from aiogram import Router, F
+from initialisation import bot
 from states import *
 
 from speech_functions import *
@@ -36,7 +37,7 @@ callbacks = Router()
 @callbacks.callback_query(lambda callback: callback.data == "Озвучить")
 async def send_voice(call: CallbackQuery, state: FSMContext):
     text = 'Wait, I am thinking...'
-    text = await language_text(call.message.from_user.id, text)
+    text = await language_text(call.from_user.id, text)
     await call.message.answer(text)
     await call.message.answer_photo(
         "https://i.pinimg.com/originals/d7/b4/5a/d7b45a0869e4c2300e81f633343f2c65.png"
@@ -54,7 +55,7 @@ async def send_voice(call: CallbackQuery, state: FSMContext):
         os.remove("output.mp3")
     except Exception as e:
         text = 'Unable to convert to voice message :('
-        text = await language_text(call.message.from_user.id, text)
+        text = await language_text(call.from_user.id, text)
         await call.message.answer(text)
         await call.message.answer_photo(
             'https://sun9-53.userapi.com/impg/mHfnSoKv3i2bNVdL6ENDOLcYuED8sBP9GVXV4w/PWekFpK_g_A.jpg?size=736x736&quality=96&sign=2bddc00da433a4a004004deb8a148055&c_uniq_tag=VuDSAXPVfTsJ24WT7KHnkqGRaxYNBXVdiZJoowjfQhM&type=album'
@@ -266,9 +267,24 @@ async def process_edit_choice(call: CallbackQuery, state: FSMContext):
                     text = 'Language successfully changed to'
                     text = await language_text(user_id, text)
                     await call.message.answer(text + ' ' + new_language+'.')
-                    await state.clear()
+                    await state.set_state(Registration.confirmed)
                 else:
                     text = 'Profile is not found.'
                     text = await language_text(user_id, text)
                     await call.message.answer(text)
+                    await state.set_state(Registration.confirmed)
     await call.answer()
+
+@callbacks.callback_query(lambda callback: callback.data == "voice enter")
+async def voice_input(call: CallbackQuery, state: FSMContext):
+    text = 'Waiting for voice message 🎧.'
+    text = await language_text(call.from_user.id, text)
+    await call.message.answer(text)
+    await state.set_state(Question.voice)
+
+@callbacks.callback_query(lambda callback: callback.data == "text enter")
+async def text_input(call: CallbackQuery, state: FSMContext):
+    text = 'Waiting for text message 📄.'
+    text = await language_text(call.from_user.id, text)
+    await call.message.answer(text)
+    await state.set_state(Question.text)

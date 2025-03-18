@@ -10,11 +10,10 @@ from states import Registration
 
 my_tasks_for_today = Router()
 
-date = datetime.today().date()
-
 @my_tasks_for_today.message(Command("my_tasks_for_today"),Registration.confirmed)
 async def show_tasks_for_date(message: Message, state: FSMContext):
     user_id = message.from_user.id
+    date = datetime.today().date()
     async with aiosqlite.connect("users.db") as db:
         async with db.execute(
             "SELECT task, status, date, time FROM tasks WHERE user_id=? and date=?",
@@ -29,6 +28,7 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
                 text = f'You have no tasks on {date}'
                 text = await language_text(user_id, text)
                 await message.answer(text)
+                await state.set_state(Registration.confirmed)
                 return
 
             response = f"Your tasks on {date}:\n"

@@ -33,10 +33,10 @@ async def start_cmd(message: Message, state: FSMContext):
                 await message.answer(text)
                 if await check_language_ru(message.from_user.id):
                     await message.answer(kb.show_commands_ru())
-                    await state.clear()
+                    await state.set_state(Registration.confirmed)
                 else:
                     await message.answer(kb.show_commands_en())
-                    await state.clear()
+                    await state.set_state(Registration.confirmed)
     
 @start.message(Registration.waiting_for_language)
 async def process_language(message: Message, state: FSMContext):
@@ -45,7 +45,10 @@ async def process_language(message: Message, state: FSMContext):
         return
 
     await state.update_data(language=message.text.lower())
-    await message.answer("Hi! What is your name?")
+    if message.text.lower() == 'ru':
+        await message.answer("Привет! Как я могу к вам обращаться?")
+    else:
+        await message.answer("Hi! What is your name?")
     await state.set_state(Registration.waiting_for_name)
 
 @start.message(Registration.waiting_for_name)
@@ -57,14 +60,14 @@ async def process_name(message: Message, state: FSMContext):
 
     async with aiosqlite.connect("users.db") as db:
         await db.execute(
-            "INSERT INTO users (user_id, name, language) VALUES (?, ?, ?)",
+            "INSERT INTO users(user_id, name, language, subscribed) VALUES (?, ?, ?, TRUE)",
             (user_id, name, language),
         )
         await db.commit()
 
-    text1 = "Registration completed! Name: "
+    text1 = "Registration completed! Name:"
     text1 = await language_text(user_id, text1)
-    text2 = "Language: "
+    text2 = "Language:"
     text2 = await language_text(user_id, text2)
     text = text1 + f" {name}, " + text2 + " " + language
     await message.answer(text)

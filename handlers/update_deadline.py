@@ -41,6 +41,7 @@ async def process_task_id(message: Message, state: FSMContext):
         text = "Please, enter thr integer ID of deadline."
         text = await language_text(message.from_user.id, text)
         await message.answer(text)
+        await state.set_state(Registration.confirmed)
         return
 
     await state.update_data(deadline_id=deadline_id)
@@ -69,7 +70,7 @@ async def set_new_time_for_deadline(message: Message, state: FSMContext):
             await message.answer(text)
             await state.set_state(Registration.confirmed)
             return
-        elif (a[0][:1] != 0 and int(a[0]) > 23) or (a[1][:1] != 0 and a[1] >= 60):
+        elif (int(a[0][:1]) != 0 and int(a[0]) > 23) or (int(a[1][:1]) != 0 and a[1] >= 60):
             text = 'Incorrect time, please try again!'
             text = await language_text(user_id, text)
             await message.answer(text)
@@ -119,14 +120,14 @@ async def set_new_time_for_deadline(message: Message, state: FSMContext):
             or len(a[0]) != 4
             or len(a[1]) != 2
             or len(a[2]) != 2
-            or a[0][:1] == 0
+            or int(a[0][:1]) == 0
         ):
             text = 'Incorrect date, please try again!'
             text = await language_text(user_id, text)
             await message.answer(text)
             await state.set_state(Registration.confirmed)
             return
-        elif (a[1][:1] != 0 and int(a[1]) > 12) or (a[2][:1] != 0 and a[2] > 31):
+        elif (int(a[1][:1]) != 0 and int(a[1]) > 12) or (int(a[2][:1]) != 0 and int(a[2]) > 31):
             text = 'Incorrect date, please try again!'
             text = await language_text(user_id, text)
             await message.answer(text)

@@ -141,3 +141,13 @@ edit_profile_en = InlineKeyboardBuilder()
 edit_profile_en.add(InlineKeyboardButton(text="Name", callback_data="edit_name"))
 edit_profile_en.add(InlineKeyboardButton(text="Language", callback_data="edit_language"))
 edit_profile_en = edit_profile_en.adjust(2).as_markup()
+
+quest_ru = InlineKeyboardBuilder()
+quest_ru.add(InlineKeyboardButton(text="Голосовой ввод", callback_data="voice enter"))
+quest_ru.add(InlineKeyboardButton(text="Ввод текстом", callback_data="text enter"))
+quest_ru = quest_ru.adjust(2).as_markup()
+
+quest_en = InlineKeyboardBuilder()
+quest_en.add(InlineKeyboardButton(text="Voice input", callback_data="voice enter"))
+quest_en.add(InlineKeyboardButton(text="Text input", callback_data="text enter"))
+quest_en = quest_en.adjust(2).as_markup()
