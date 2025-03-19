@@ -3,8 +3,9 @@ from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import Message, FSInputFile
 from aiogram.fsm.context import FSMContext
 import aiosqlite
+from aiogram_dialog import DialogManager, StartMode
 
-from states import Question, GetTaskListForDate, Registration
+from states import Question, GetTaskListForDate, Registration, MySG
 from speech_functions import *
 
 from aiogram import Router
@@ -13,10 +14,13 @@ my_tasks_for_date = Router()
 
 
 @my_tasks_for_date.message(Command("my_tasks_for_date"), Registration.confirmed)
-async def ask_for_date(message: Message, state: FSMContext):
-    text = 'Enter the date in format YYYY-MM-DD'
+async def ask_for_date(message: Message, state: FSMContext, dialog_manager: DialogManager):
+    text = 'Choose the date:'
     text = await language_text(message.from_user.id, text)
-    await message.answer(text)
+    await dialog_manager.start(MySG.main,
+                               data={"text_from_chat": text, "flag": "tsk_fdt",
+                                     "state": state},
+                               mode=StartMode.RESET_STACK)
     await state.set_state(GetTaskListForDate.waiting_for_date)
 
 

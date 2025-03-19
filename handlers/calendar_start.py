@@ -41,13 +41,15 @@ async def on_date_selected(callback: CallbackQuery, widget,
         text = "You updated the date of the deadline:"
     elif formatted_flag == "upd_tsk":
         text = "You updated the date of the task:"
+    elif formatted_flag == "tsk_fdt":
+        text = "You chose the date:"
     else:
         await callback.message.answer("Error: Incorrect usage of calendar")
         await manager.done()
     text = await language_text(callback.from_user.id, text)
     if formatted_flag == "dd" or formatted_flag == "tsk":
         await callback.message.answer(f"{text}\n{selected_date} - {formatted_deadline_or_task}")
-    elif formatted_flag == "upd_dd" or formatted_flag == "upd_tsk":
+    elif formatted_flag == "upd_dd" or formatted_flag == "upd_tsk" or formatted_flag == "tsk_fdt":
         await callback.message.answer(f"{text}\n{selected_date}")
     await state.update_data({"data": selected_date})
     text = 'Enter time in format HH:MM'

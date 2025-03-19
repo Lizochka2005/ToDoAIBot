@@ -14,7 +14,7 @@ llm = ChatGroq(model="llama3-70b-8192")
 
 # llm = GigaChat(credentials=token, model='GigaChat:latest', verify_ssl_certs=False)
 
-TOKEN_BOT = "7685591016:AAG8M4rZPovKNrOuKqq6sMwT8stOg1vk2rc"
+TOKEN_BOT = "8170498248:AAHxTsGCJ0NEP_7Qjs9xQQXTmhC19zEmQ_w"
 
 bot = Bot(token=TOKEN_BOT, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(storage=MemoryStorage())
