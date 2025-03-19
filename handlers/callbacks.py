@@ -4,6 +4,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 import os
 from aiogram import Router, F
+from aiogram_dialog import DialogManager, StartMode
+
 from initialisation import bot
 from states import *
 
@@ -84,17 +86,23 @@ async def update_deadline_time(call: CallbackQuery, state: FSMContext):
     await state.set_state(DeadlineUpdate.waiting_for_new_time)
 
 @callbacks.callback_query(lambda callback: callback.data == "дата дэдлайн")
-async def update_deadline_date(call: CallbackQuery, state: FSMContext):
-    text = 'Enter the date you want to change the deadline execution in format YYYY-MM-DD:'
+async def update_deadline_date(call: CallbackQuery, state: FSMContext, dialog_manager: DialogManager):
+    text = 'Enter the date you want to change the deadline execution:'
     text = await language_text(call.from_user.id, text)
-    await call.message.answer(text)
+    await dialog_manager.start(MySG.main,
+                               data={"text_from_chat": text, "flag": "upd_dd",
+                                     "state": state},
+                               mode=StartMode.RESET_STACK)
     await state.set_state(DeadlineUpdate.waiting_for_new_date)
 
 @callbacks.callback_query(lambda callback: callback.data == "дата задача")
-async def update_task_date(call: CallbackQuery, state: FSMContext):
-    text = 'Enter the date you want to change the task execution in format YYYY-MM-DD:'
+async def update_task_date(call: CallbackQuery, state: FSMContext, dialog_manager: DialogManager):
+    text = 'Enter the date you want to change the task execution:'
     text = await language_text(call.from_user.id, text)
-    await call.message.answer(text)
+    await dialog_manager.start(MySG.main,
+                               data={"text_from_chat": text, "flag": "upd_tsk",
+                                     "state": state},
+                               mode=StartMode.RESET_STACK)
     await state.set_state(TaskUpdate.waiting_for_new_date)
 
 @callbacks.callback_query(lambda callback: callback.data == "статус дэдлайн")
