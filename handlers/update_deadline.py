@@ -25,12 +25,19 @@ async def update_deadline_cmd(message: Message, state: FSMContext):
             await message.answer(text)
             return
 
-        response = "Your deadlines:\n"
-        for deadline_id, deadline, date, time, status in deadlines:
-            response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
-
-        response += "Enter the ID of deadline which you want to update:"
+        response = "Your deadlines:"
         response = await language_text(user_id, response)
+        response += '\n'
+        for deadline_id, deadline, date, time, status in deadlines:
+            if await check_language_ru(user_id):
+                response += f"{deadline_id}. {deadline} (Дата: {date}, Время: {time}, Статус: {status})\n"
+            else:
+                status = await translate_text_to_en(status)
+                response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
+
+        text = "Enter the ID of deadline which you want to update:"
+        text = await language_text(user_id, text)
+        response += text
         await message.answer(response)
         await state.set_state(DeadlineUpdate.waiting_for_deadline_id)
 
@@ -38,7 +45,7 @@ async def update_deadline_cmd(message: Message, state: FSMContext):
 async def process_task_id(message: Message, state: FSMContext):
     deadline_id = message.text
     if not deadline_id.isdigit():
-        text = "Please, enter thr integer ID of deadline."
+        text = "Please, enter the integer ID of deadline."
         text = await language_text(message.from_user.id, text)
         await message.answer(text)
         await state.set_state(Registration.confirmed)
@@ -97,12 +104,16 @@ async def set_new_time_for_deadline(message: Message, state: FSMContext):
       async with db.execute("SELECT id, deadline, date, time, status FROM deadlines WHERE id = ?", (id,)) as cursor:
         deadlines = await cursor.fetchall()
 
-        response = "Your deadline:\n"
-        for deadline_id, deadline, date, time, status in deadlines:
-            status = await translate_text_to_en(user_id, status)
-            response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
-
+        response = "Your deadline:"
         response = await language_text(user_id, response)
+        response += '\n'
+        for deadline_id, deadline, date, time, status in deadlines:
+            if await check_language_ru(user_id):
+                response += f"{deadline_id}. {deadline} (Дата: {date}, Время: {time}, Статус: {status})\n"
+            else:
+                status = await translate_text_to_en(status)
+                response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
+
         await message.answer(response)
         await state.set_state(Registration.confirmed)
 
@@ -154,12 +165,16 @@ async def set_new_time_for_deadline(message: Message, state: FSMContext):
       async with db.execute("SELECT id, deadline, date, time, status FROM deadlines WHERE id = ?", (id,)) as cursor:
         deadlines = await cursor.fetchall()
 
-        response = "Your deadline:\n"
-        for deadline_id, deadline, date, time, status in deadlines:
-            status = await translate_text_to_en(user_id, status)
-            response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
-
+        response = "Your deadline:"
         response = await language_text(user_id, response)
+        response += '\n'
+        for deadline_id, deadline, date, time, status in deadlines:
+            if await check_language_ru(user_id):
+                response += f"{deadline_id}. {deadline} (Дата: {date}, Время: {time}, Статус: {status})\n"
+            else:
+                status = await translate_text_to_en(status)
+                response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
+
         await message.answer(response)
         await state.set_state(Registration.confirmed)
     

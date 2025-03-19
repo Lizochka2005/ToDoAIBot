@@ -18,9 +18,11 @@ from langchain_groq import ChatGroq
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 
+import ctypes
 
 from states import Question
 from database.database_and_functions_GetStatistics import start_db
+# from handlers.calendar_start import calendar_start
 from handlers.add_deadline import add_deadline
 from handlers.add_task import add_task
 from handlers.my_nearest_deadlines import my_nearest_deadlines
@@ -34,14 +36,15 @@ from handlers.callbacks import callbacks
 # from handlers.answer_voice_message import answer_voice_message
 from handlers.default_handler import default_handler
 from handlers.answer_question import answer_question
-from handlers.edit_profile import edit_profile
-from handlers.notifications import notifications
+from handlers.calendar_start import dialog
 from initialisation import llm, bot, dp
 import keyboards as kb
+from aiogram_dialog import setup_dialogs
 from set_scheduler import *
 
-async def main():
 
+async def main():
+    # dp.include_router(calendar_start)
     dp.include_router(start)
     dp.include_router(answer_question)
     dp.include_router(add_deadline)
@@ -53,11 +56,12 @@ async def main():
     dp.include_router(update_task)
     dp.include_router(callbacks)
     # dp.include_router(answer_voice_message)
-    dp.include_router(edit_profile)
-    dp.include_router(notifications)
     dp.include_router(default_handler)
-    
+
     setup_scheduler()
+
+    dp.include_router(dialog)
+    setup_dialogs(dp)
 
     dp.startup.register(start_db)
     try:

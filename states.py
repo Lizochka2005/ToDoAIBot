@@ -15,7 +15,6 @@ class UpdateRegistration(StatesGroup):
 
 class TaskCreation(StatesGroup):
     waiting_for_task = State()
-    waiting_for_date = State()
     waiting_for_time = State()
 
 class TaskUpdate(StatesGroup):
@@ -26,7 +25,6 @@ class TaskUpdate(StatesGroup):
 
 class DeadlineCreation(StatesGroup):
     waiting_for_deadline = State()
-    waiting_for_date = State()
     waiting_for_time = State()
 
 class DeadlineUpdate(StatesGroup):
@@ -42,3 +40,9 @@ class EditProfile(StatesGroup):
     waiting_for_choice = State()
     waiting_for_name = State()
     waiting_for_language = State()
+
+class GetTaskListForDate(StatesGroup):
+    waiting_for_date = State()
+
+class MySG(StatesGroup):
+    main = State()

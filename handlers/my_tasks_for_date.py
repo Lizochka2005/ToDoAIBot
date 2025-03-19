@@ -69,10 +69,13 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
                 return
 
             response = f"Your tasks on {date}:\n"
-            for task, status, date, time in tasks:
-                status = await translate_text_to_en(user_id, status)
-                response += f"- {task} (Status: {status}, Time: {time})\n"
-            
             response = await language_text(user_id, response)
+            for task, status, date, time in tasks:
+                if await check_language_ru(user_id):
+                    response += f"- {task} (Cтатус: {status}, Время: {time})\n"
+                else:
+                    status = await translate_text_to_en(status)
+                    response += f"- {task} (Status: {status}, Time: {time})\n"
+            
             await message.answer(response)
             await state.set_state(Registration.confirmed)

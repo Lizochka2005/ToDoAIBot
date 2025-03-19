@@ -24,12 +24,19 @@ async def update_task_cmd(message: Message, state: FSMContext):
             await message.answer(text)
             return
 
-        response = "Your tasks:\n"
-        for task_id, task, date, time, status in tasks:
-            response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
-
-        response += "Enter the ID of task which you want to update:"
+        response = "Your tasks:"
         response = await language_text(user_id, response)
+        response += '\n'
+        for task_id, task, date, time, status in tasks:
+            if await check_language_ru(user_id):
+                response += f"{task_id}. {task} (Дата: {date}, Время: {time}, Статус: {status})\n"
+            else:
+                status = await translate_text_to_en(status)
+                response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
+
+        text = "Enter the ID of task which you want to update:"
+        text = await language_text(user_id, text)
+        response += text
         await message.answer(response)
         await state.set_state(TaskUpdate.waiting_for_task_id)
 
@@ -96,12 +103,16 @@ async def set_new_time_for_task(message: Message, state: FSMContext):
       async with db.execute("SELECT id, task, date, time, status FROM tasks WHERE id = ?", (id,)) as cursor:
         tasks = await cursor.fetchall()
 
-        response = "Your task:\n"
-        for task_id, task, date, time, status in tasks:
-            status = await translate_text_to_en(user_id, status)
-            response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
-
+        response = "Your task:"
         response = await language_text(user_id, response)
+        response += '\n'
+        for task_id, task, date, time, status in tasks:
+            if await check_language_ru(user_id):
+                    response += f"{task_id}. {task} (Дата: {date}, Время: {time}, Статус: {status})\n"
+            else:
+                status = await translate_text_to_en(status)
+                response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
+
         await message.answer(response)
         await state.set_state(Registration.confirmed)
 
@@ -154,12 +165,16 @@ async def set_new_time_for_deadline(message: Message, state: FSMContext):
       async with db.execute("SELECT id, task, date, time, status FROM tasks WHERE id = ?", (id,)) as cursor:
         tasks = await cursor.fetchall()
 
-        response = "Your task:\n"
-        for task_id, task, date, time, status in tasks:
-            status = await translate_text_to_en(user_id, status)
-            response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
-
+        response = 'Your task:'
         response = await language_text(user_id, response)
+        response += '\n'
+        for task_id, task, date, time, status in tasks:
+            if await check_language_ru(user_id):
+                response += f"{task_id}. {task} (Дата: {date}, Время: {time}, Статус: {status})\n"
+            else:
+                status = await translate_text_to_en(status)
+                response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
+
         await message.answer(response)
         await state.set_state(Registration.confirmed)
     
