@@ -24,13 +24,14 @@ async def edit_profile_cmd(message: Message, state: FSMContext):
 
             name, language = user_data
             text = []
+            res = []
             text.append('Your current profile:')
             text.append('Name:')
             text.append('Language:')
             text.append('What do you want to change?')
             for el in text:
-                el = await language_text(user_id, el)
-            response = text[0]+'\n'+text[1]+' '+name+'\n'+text[2]+' '+language+'\n\n'+text[3]
+                res.append(await language_text(user_id, el))
+            response = res[0]+'\n'+res[1]+' '+name+'\n'+res[2]+' '+language+'\n\n'+res[3]
             if await check_language_ru(user_id):
                 await message.answer(response, reply_markup=kb.edit_profile_ru)
             else:
