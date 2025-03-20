@@ -4,31 +4,31 @@ import os
 # from googletrans import Translator
 from translate import Translator
 import asyncio
-# import whisper
+import whisper
 # import speech_recognition as sr
 # from pydub import AudioSegment
 import aiosqlite
 
 
-def text_to_speech(text, lang):
-    res = gTTS(text=text, lang=lang)
-    filename = "output.mp3"
-    res.save(filename)
-    os.system(f"start {filename}")
-
 # def text_to_speech(text, lang):
-#     engine = pyttsx3.init()
+#     res = gTTS(text=text, lang=lang)
+#     filename = "output.mp3"
+#     res.save(filename)
+#     os.system(f"start {filename}")
 
-#     # Установка языка (если поддерживается)
-#     voices = engine.getProperty('voices')
-#     if lang == 'en':
-#         engine.setProperty('voice', voices[1].id)  # Английский
-#     elif lang == 'ru':
-#         engine.setProperty('voice', voices[0].id)  # Русский (если доступен)
-#     else:
-#         print(f"Язык {lang} не поддерживается. Используется язык по умолчанию.")
-#     engine.save_to_file(text, 'output.mp3')
-#     engine.runAndWait()
+def text_to_speech(text, lang):
+    engine = pyttsx3.init()
+
+    # Установка языка (если поддерживается)
+    voices = engine.getProperty('voices')
+    if lang == 'en':
+        engine.setProperty('voice', voices[1].id)  # Английский
+    elif lang == 'ru':
+        engine.setProperty('voice', voices[0].id)  # Русский (если доступен)
+    else:
+        print(f"Язык {lang} не поддерживается. Используется язык по умолчанию.")
+    engine.save_to_file(text, 'output.mp3')
+    engine.runAndWait()
 
 
 async def translate_text(text):
@@ -56,10 +56,10 @@ async def translate_text_to_en(text):
         print("Переводчик не робит :(")
         print(f"Произошла ошибка: {e}")
 
-# async def recognize_speech(audio_path, language="ru"):
-#     model = whisper.load_model("base")
-#     result = model.transcribe(audio_path, language=language)
-#     return result["text"].strip()
+async def recognize_speech(audio_path, language="ru"):
+    model = whisper.load_model("base")
+    result = model.transcribe(audio_path, language=language)
+    return result["text"].strip()
 
 # async def recognize_speech(audio_path, language):
 #     recognizer = sr.Recognizer()
