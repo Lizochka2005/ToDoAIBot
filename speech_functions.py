@@ -1,4 +1,4 @@
-# from gtts import gTTS
+from gtts import gTTS
 import pyttsx3
 import os
 # from googletrans import Translator
@@ -10,25 +10,25 @@ import asyncio
 import aiosqlite
 
 
-# def text_to_speech(text, lang):ЫЫ
-#     res = gTTS(text=text, lang=lang)
-#     filename = "output.mp3"
-#     res.save(filename)
-#     os.system(f"start {filename}")
-
 def text_to_speech(text, lang):
-    engine = pyttsx3.init()
+    res = gTTS(text=text, lang=lang)
+    filename = "output.mp3"
+    res.save(filename)
+    os.system(f"start {filename}")
 
-    # Установка языка (если поддерживается)
-    voices = engine.getProperty('voices')
-    if lang == 'en':
-        engine.setProperty('voice', voices[1].id)  # Английский
-    elif lang == 'ru':
-        engine.setProperty('voice', voices[0].id)  # Русский (если доступен)
-    else:
-        print(f"Язык {lang} не поддерживается. Используется язык по умолчанию.")
-    engine.save_to_file(text, 'output.mp3')
-    engine.runAndWait()
+# def text_to_speech(text, lang):
+#     engine = pyttsx3.init()
+
+#     # Установка языка (если поддерживается)
+#     voices = engine.getProperty('voices')
+#     if lang == 'en':
+#         engine.setProperty('voice', voices[1].id)  # Английский
+#     elif lang == 'ru':
+#         engine.setProperty('voice', voices[0].id)  # Русский (если доступен)
+#     else:
+#         print(f"Язык {lang} не поддерживается. Используется язык по умолчанию.")
+#     engine.save_to_file(text, 'output.mp3')
+#     engine.runAndWait()
 
 
 async def translate_text(text):

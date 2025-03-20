@@ -16,7 +16,7 @@ update_deadline = Router()
 async def update_deadline_cmd(message: Message, state: FSMContext):
     user_id = message.from_user.id
     async with aiosqlite.connect('users.db') as db:
-      async with db.execute("SELECT id, deadline, date, time, status FROM deadlines WHERE user_id=? and status not like('Завершён')", (user_id,)) as cursor:
+      async with db.execute("SELECT id, deadline, date, time, status FROM deadlines WHERE user_id=?", (user_id,)) as cursor:
         deadlines = await cursor.fetchall()
 
         if not deadlines:
@@ -118,38 +118,11 @@ async def set_new_time_for_deadline(message: Message, state: FSMContext):
         await state.set_state(Registration.confirmed)
 
 @update_deadline.message(DeadlineUpdate.waiting_for_new_date)
-async def set_new_time_for_deadline(message: Message, state: FSMContext):
+async def set_new_date_for_deadline(message: Message, state: FSMContext):
     user_data = await state.get_data()
-    date = message.text
-    user_id = message.from_user.id
+    date = user_data['data']
+    user_id = user_data['user_id']
     id = user_data["deadline_id"]
-
-    try:
-        a = date.split("-")
-        if (
-            len(a) != 3
-            or len(a[0]) != 4
-            or len(a[1]) != 2
-            or len(a[2]) != 2
-            or int(a[0][:1]) == 0
-        ):
-            text = 'Incorrect date, please try again!'
-            text = await language_text(user_id, text)
-            await message.answer(text)
-            await state.set_state(Registration.confirmed)
-            return
-        elif (int(a[1][:1]) != 0 and int(a[1]) > 12) or (int(a[2][:1]) != 0 and int(a[2]) > 31):
-            text = 'Incorrect date, please try again!'
-            text = await language_text(user_id, text)
-            await message.answer(text)
-            await state.set_state(Registration.confirmed)
-            return
-    except Exception as e:
-        text = 'Incorrect date, please try again!'
-        text = await language_text(user_id, text)
-        await message.answer(text)
-        await state.set_state(Registration.confirmed)
-        return
     
     async with aiosqlite.connect("users.db") as db:
         await db.execute(

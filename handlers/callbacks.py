@@ -5,7 +5,6 @@ from aiogram.types import CallbackQuery
 import os
 from aiogram import Router, F
 from aiogram_dialog import DialogManager, StartMode
-
 from initialisation import bot
 from states import *
 
@@ -38,8 +37,10 @@ callbacks = Router()
 
 @callbacks.callback_query(lambda callback: callback.data == "Озвучить")
 async def send_voice(call: CallbackQuery, state: FSMContext):
-    text = 'Wait, I am thinking...'
-    text = await language_text(call.from_user.id, text)
+    if check_language_ru(call.from_user.id):
+        text = 'Подождите, я думаю...'
+    else:
+        text = 'Wait, I am thinking...'
     await call.message.answer(text)
     await call.message.answer_photo(
         "https://i.pinimg.com/originals/d7/b4/5a/d7b45a0869e4c2300e81f633343f2c65.png"
@@ -87,8 +88,10 @@ async def update_deadline_time(call: CallbackQuery, state: FSMContext):
 
 @callbacks.callback_query(lambda callback: callback.data == "дата дэдлайн")
 async def update_deadline_date(call: CallbackQuery, state: FSMContext, dialog_manager: DialogManager):
-    text = 'Enter the date you want to change the deadline execution:'
+    text = 'Choose the date you want to change the deadline execution:'
     text = await language_text(call.from_user.id, text)
+    await call.message.answer(text)
+    await state.update_data(user_id=call.from_user.id)
     await dialog_manager.start(MySG.main,
                                data={"text_from_chat": text, "flag": "upd_dd",
                                      "state": state},
@@ -97,8 +100,10 @@ async def update_deadline_date(call: CallbackQuery, state: FSMContext, dialog_ma
 
 @callbacks.callback_query(lambda callback: callback.data == "дата задача")
 async def update_task_date(call: CallbackQuery, state: FSMContext, dialog_manager: DialogManager):
-    text = 'Enter the date you want to change the task execution:'
+    text = 'Choose the date you want to change the task execution:'
     text = await language_text(call.from_user.id, text)
+    await call.message.answer(text)
+    await state.update_data(user_id=call.from_user.id)
     await dialog_manager.start(MySG.main,
                                data={"text_from_chat": text, "flag": "upd_tsk",
                                      "state": state},

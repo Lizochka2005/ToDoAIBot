@@ -12,9 +12,12 @@ from aiogram_dialog import DialogManager, Window, Dialog
 from aiogram_dialog.widgets.kbd import Calendar
 from aiogram_dialog.widgets.text import Format
 from initialisation import dp
+from handlers.my_tasks_for_date import show_tasks_for_date
+from handlers.update_deadline import set_new_date_for_deadline
+from handlers.update_task import set_new_date_for_task
 
 from aiogram.fsm.context import FSMContext
-from states import Registration, Question, MySG, DeadlineCreation
+from states import *
 
 
 async def on_date_selected(callback: CallbackQuery, widget,
@@ -49,12 +52,19 @@ async def on_date_selected(callback: CallbackQuery, widget,
     text = await language_text(callback.from_user.id, text)
     if formatted_flag == "dd" or formatted_flag == "tsk":
         await callback.message.answer(f"{text}\n{selected_date} - {formatted_deadline_or_task}")
+        text = 'Enter time in format HH:MM'
+        text = await language_text(callback.from_user.id, text)
+        await callback.message.answer(text)
+        await state.update_data({"data": selected_date})
     elif formatted_flag == "upd_dd" or formatted_flag == "upd_tsk" or formatted_flag == "tsk_fdt":
         await callback.message.answer(f"{text}\n{selected_date}")
-    await state.update_data({"data": selected_date})
-    text = 'Enter time in format HH:MM'
-    text = await language_text(callback.from_user.id, text)
-    await callback.message.answer(text)
+        await state.update_data({"data": selected_date})
+        if formatted_flag == "tsk_fdt":
+            await show_tasks_for_date(callback.message, state)
+        elif formatted_flag == "upd_dd":
+            await set_new_date_for_deadline(callback.message, state)
+        else:
+            await set_new_date_for_task(callback.message, state)
     await manager.done()
 
 calendar = Calendar(id='calendar', on_click=on_date_selected)

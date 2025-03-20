@@ -2,8 +2,8 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import Message, FSInputFile
 from aiogram.fsm.context import FSMContext
-import aiosqlite
 from aiogram_dialog import DialogManager, StartMode
+import aiosqlite
 
 from states import Question, GetTaskListForDate, Registration, MySG
 from speech_functions import *
@@ -17,43 +17,18 @@ my_tasks_for_date = Router()
 async def ask_for_date(message: Message, state: FSMContext, dialog_manager: DialogManager):
     text = 'Choose the date:'
     text = await language_text(message.from_user.id, text)
+    await state.update_data(user_id=message.from_user.id)
     await dialog_manager.start(MySG.main,
                                data={"text_from_chat": text, "flag": "tsk_fdt",
                                      "state": state},
                                mode=StartMode.RESET_STACK)
     await state.set_state(GetTaskListForDate.waiting_for_date)
 
-
 @my_tasks_for_date.message(GetTaskListForDate.waiting_for_date)
 async def show_tasks_for_date(message: Message, state: FSMContext):
-    date = message.text
-    user_id = message.from_user.id
-    try:
-        a = date.split("-")
-        if (
-            len(a) != 3
-            or len(a[0]) != 4
-            or len(a[1]) != 2
-            or len(a[2]) != 2
-            or int(a[0][:1]) == 0
-        ):
-            text = 'Incorrect date, please try again!'
-            text = await language_text(user_id, text)
-            await message.answer(text)
-            await state.set_state(Registration.confirmed)
-            return
-        elif (int(a[1][:1]) != 0 and int(a[1]) > 12) or (int(a[2][:1]) != 0 and int(a[2]) > 31):
-            text = 'Incorrect date, please try again!'
-            text = await language_text(user_id, text)
-            await message.answer(text)
-            await state.set_state(Registration.confirmed)
-            return
-    except Exception as e:
-        text = 'Incorrect date, please try again!'
-        text = await language_text(user_id, text)
-        await message.answer(text)
-        await state.set_state(Registration.confirmed)
-        return
+    user_data = await state.get_data()
+    date = user_data['data']
+    user_id = user_data['user_id']
 
     async with aiosqlite.connect("users.db") as db:
         async with db.execute(
@@ -72,8 +47,9 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
                 await state.set_state(Registration.confirmed)
                 return
 
-            response = f"Your tasks on {date}:\n"
+            response = f"Your tasks on {date}:"
             response = await language_text(user_id, response)
+            response += '\n'
             for task, status, date, time in tasks:
                 if await check_language_ru(user_id):
                     response += f"- {task} (Cтатус: {status}, Время: {time})\n"

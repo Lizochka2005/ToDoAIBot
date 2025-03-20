@@ -14,16 +14,16 @@ async def start_db():
                       user_id INTEGER,
                       task TEXT,
                       status TEXT DEFAULT 'Не выполнено',
-                      date DATE,
-                      time TIME,
+                      date TEXT,
+                      time TEXT,
                       FOREIGN KEY (user_id) REFERENCES users(user_id))''')
         await db.execute('''CREATE TABLE IF NOT EXISTS deadlines (
                       id INTEGER PRIMARY KEY AUTOINCREMENT,
                       user_id INTEGER,
                       deadline TEXT,
                       status TEXT DEFAULT 'Не завершён',
-                      date DATE,
-                      time TIME,
+                      date TEXT,
+                      time TEXT,
                       FOREIGN KEY (user_id) REFERENCES users(user_id))''')
 
         await db.commit()
@@ -41,6 +41,6 @@ async def get_daily_stats(user_id: int):
       # Считаем количество выполненных задач за сегодня
       async with db.execute("SELECT COUNT(*) FROM tasks WHERE user_id = ? AND date = ? AND status = ?", (user_id, today, "Выполнено")) as cursor:
         completed_tasks = await cursor.fetchone()
-        completed_tasks = total_tasks[0] or 0
+        completed_tasks = completed_tasks[0] or 0
 
     return total_tasks, completed_tasks

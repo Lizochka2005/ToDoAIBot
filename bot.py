@@ -37,6 +37,8 @@ from handlers.callbacks import callbacks
 from handlers.default_handler import default_handler
 from handlers.answer_question import answer_question
 from handlers.calendar_start import dialog
+from handlers.notifications import notifications
+from handlers.edit_profile import edit_profile
 from initialisation import llm, bot, dp
 import keyboards as kb
 from aiogram_dialog import setup_dialogs
@@ -55,6 +57,8 @@ async def main():
     dp.include_router(update_deadline)
     dp.include_router(update_task)
     dp.include_router(callbacks)
+    dp.include_router(notifications)
+    dp.include_router(edit_profile)
     # dp.include_router(answer_voice_message)
     dp.include_router(default_handler)
 
