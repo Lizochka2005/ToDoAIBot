@@ -32,6 +32,7 @@ async def llm_answer(message: Message, state: FSMContext):
         ans = agent.run(message.text)
         print("Ответ получен")
         ans = await language_text(message.from_user.id, ans)
+        print(ans)
         if await check_language_ru(message.from_user.id):
             await state.update_data(answer_ru=ans)
             await state.update_data(lan="ru")

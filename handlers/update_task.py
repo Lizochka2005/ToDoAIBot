@@ -149,5 +149,5 @@ async def set_new_date_for_task(message: Message, state: FSMContext):
                 response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
 
         await message.answer(response)
-        await state.set_state(Registration.confirmed)
+        await state.set_state(Registration.confirmed) 
     

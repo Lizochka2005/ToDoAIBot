@@ -14,5 +14,5 @@ async def answerForEverything(message: Message, state: FSMContext):
     else:
         text = "Don't know what to answer😓 Try using commands or use command"
         text = await language_text(message.from_user.id, text)
-        text += ' \start.'
+        text += ' /start.'
     await message.answer(text)

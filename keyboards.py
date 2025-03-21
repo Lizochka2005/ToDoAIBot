@@ -1,5 +1,11 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.utils.keyboard import (
+    InlineKeyboardBuilder,
+    ReplyKeyboardBuilder,
+    KeyboardButton,
+)
+from aiogram import Bot
+from aiogram.types import BotCommand, BotCommandScopeDefault
 
 
 say_en = InlineKeyboardMarkup(
@@ -58,7 +64,7 @@ commands = [
     "update_task",
     "notifications_on",
     "notifications_off",
-    "edit_profile"
+    "edit_profile",
 ]
 
 
@@ -69,12 +75,14 @@ def show_commands_ru():
         bot_commands += "/" + command + "\n"
     return bot_commands
 
+
 def show_commands_en():
     # вывод команд бота
     bot_commands = "Bot has commands:\n"
     for command in commands:
         bot_commands += "/" + command + "\n"
     return bot_commands
+
 
 setNotifications_ru = InlineKeyboardBuilder()
 setNotifications_ru.add(InlineKeyboardButton(text="Включить", callback_data="able"))
@@ -89,13 +97,19 @@ setNotifications_en = setNotifications_en.adjust(2).as_markup()
 update_deadline_en = InlineKeyboardBuilder()
 update_deadline_en.add(InlineKeyboardButton(text="Time", callback_data="время дэдлайн"))
 update_deadline_en.add(InlineKeyboardButton(text="Date", callback_data="дата дэдлайн"))
-update_deadline_en.add(InlineKeyboardButton(text="Status", callback_data="статус дэдлайн"))
+update_deadline_en.add(
+    InlineKeyboardButton(text="Status", callback_data="статус дэдлайн")
+)
 update_deadline_en = update_deadline_en.adjust(3).as_markup()
 
 update_deadline_ru = InlineKeyboardBuilder()
-update_deadline_ru.add(InlineKeyboardButton(text="Время", callback_data="время дэдлайн"))
+update_deadline_ru.add(
+    InlineKeyboardButton(text="Время", callback_data="время дэдлайн")
+)
 update_deadline_ru.add(InlineKeyboardButton(text="Дата", callback_data="дата дэдлайн"))
-update_deadline_ru.add(InlineKeyboardButton(text="Статус", callback_data="статус дэдлайн"))
+update_deadline_ru.add(
+    InlineKeyboardButton(text="Статус", callback_data="статус дэдлайн")
+)
 update_deadline_ru = update_deadline_ru.adjust(3).as_markup()
 
 update_task_en = InlineKeyboardBuilder()
@@ -111,25 +125,49 @@ update_task_ru.add(InlineKeyboardButton(text="Статус", callback_data="ст
 update_task_ru = update_task_ru.adjust(3).as_markup()
 
 update_status_task_en = InlineKeyboardBuilder()
-update_status_task_en.add(InlineKeyboardButton(text="Completed", callback_data="completed task"))
-update_status_task_en.add(InlineKeyboardButton(text="Partially completed", callback_data="partially completed task"))
-update_status_task_en.add(InlineKeyboardButton(text="Not completed", callback_data="not completed task"))
+update_status_task_en.add(
+    InlineKeyboardButton(text="Completed", callback_data="completed task")
+)
+update_status_task_en.add(
+    InlineKeyboardButton(
+        text="Partially completed", callback_data="partially completed task"
+    )
+)
+update_status_task_en.add(
+    InlineKeyboardButton(text="Not completed", callback_data="not completed task")
+)
 update_status_task_en = update_status_task_en.adjust(3).as_markup()
 
 update_status_task_ru = InlineKeyboardBuilder()
-update_status_task_ru.add(InlineKeyboardButton(text="Выполнено", callback_data="completed task"))
-update_status_task_ru.add(InlineKeyboardButton(text="Частично выполнено", callback_data="partially completed task"))
-update_status_task_ru.add(InlineKeyboardButton(text="Не выполнено", callback_data="not completed task"))
+update_status_task_ru.add(
+    InlineKeyboardButton(text="Выполнено", callback_data="completed task")
+)
+update_status_task_ru.add(
+    InlineKeyboardButton(
+        text="Частично выполнено", callback_data="partially completed task"
+    )
+)
+update_status_task_ru.add(
+    InlineKeyboardButton(text="Не выполнено", callback_data="not completed task")
+)
 update_status_task_ru = update_status_task_ru.adjust(3).as_markup()
 
 update_status_deadline_en = InlineKeyboardBuilder()
-update_status_deadline_en.add(InlineKeyboardButton(text="Completed", callback_data="completed deadline"))
-update_status_deadline_en.add(InlineKeyboardButton(text="Not completed", callback_data="not completed deadline"))
+update_status_deadline_en.add(
+    InlineKeyboardButton(text="Completed", callback_data="completed deadline")
+)
+update_status_deadline_en.add(
+    InlineKeyboardButton(text="Not completed", callback_data="not completed deadline")
+)
 update_status_deadline_en = update_status_deadline_en.adjust(2).as_markup()
 
 update_status_deadline_ru = InlineKeyboardBuilder()
-update_status_deadline_ru.add(InlineKeyboardButton(text="Завершён", callback_data="completed deadline"))
-update_status_deadline_ru.add(InlineKeyboardButton(text="Не завершён", callback_data="not completed deadline"))
+update_status_deadline_ru.add(
+    InlineKeyboardButton(text="Завершён", callback_data="completed deadline")
+)
+update_status_deadline_ru.add(
+    InlineKeyboardButton(text="Не завершён", callback_data="not completed deadline")
+)
 update_status_deadline_ru = update_status_deadline_ru.adjust(2).as_markup()
 
 edit_profile_ru = InlineKeyboardBuilder()
@@ -139,7 +177,9 @@ edit_profile_ru = edit_profile_ru.adjust(2).as_markup()
 
 edit_profile_en = InlineKeyboardBuilder()
 edit_profile_en.add(InlineKeyboardButton(text="Name", callback_data="edit_name"))
-edit_profile_en.add(InlineKeyboardButton(text="Language", callback_data="edit_language"))
+edit_profile_en.add(
+    InlineKeyboardButton(text="Language", callback_data="edit_language")
+)
 edit_profile_en = edit_profile_en.adjust(2).as_markup()
 
 quest_ru = InlineKeyboardBuilder()
@@ -151,3 +191,11 @@ quest_en = InlineKeyboardBuilder()
 quest_en.add(InlineKeyboardButton(text="Voice input", callback_data="voice enter"))
 quest_en.add(InlineKeyboardButton(text="Text input", callback_data="text enter"))
 quest_en = quest_en.adjust(2).as_markup()
+
+
+choose_language = ReplyKeyboardBuilder()
+choose_language.add(KeyboardButton(text="ru"))
+choose_language.add(KeyboardButton(text="en"))
+choose_language = choose_language.as_markup(
+    resize_keyboard=True, one_time_keyboard=True
+)
