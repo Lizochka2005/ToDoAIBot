@@ -9,6 +9,7 @@ from aiogram import Router
 from states import DeadlineUpdate, Registration
 from speech_functions import *
 import keyboards as kb
+from datetime import datetime
 
 update_deadline = Router()
 
@@ -29,11 +30,17 @@ async def update_deadline_cmd(message: Message, state: FSMContext):
         response = await language_text(user_id, response)
         response += '\n'
         for deadline_id, deadline, date, time, status in deadlines:
+            date = datetime.strptime(date, '%Y-%m-%d')
+            formatted_date = date.strftime('%d %B %Y')
+            if await check_language_ru(message.from_user.id):
+                date = formatted_date.split(' ')
+                month = await language_text(message.from_user.id, date[1])
+                formatted_date = f'{date[0]} {month} {date[-1]}'
             if await check_language_ru(user_id):
-                response += f"{deadline_id}. {deadline} (Дата: {date}, Время: {time}, Статус: {status})\n"
+                response += f"{deadline_id}. {deadline} (Дата: {formatted_date}, Время: {time}, Статус: {status})\n"
             else:
                 status = await translate_text_to_en(status)
-                response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
+                response += f"{deadline_id}. {deadline} (Date: {formatted_date}, Time: {time}, Status: {status})\n"
 
         text = "Enter the number of deadline which you want to update:"
         text = await language_text(user_id, text)
@@ -113,11 +120,17 @@ async def set_new_time_for_deadline(message: Message, state: FSMContext):
         response = await language_text(user_id, response)
         response += '\n'
         for deadline_id, deadline, date, time, status in deadlines:
+            date = datetime.strptime(date, '%Y-%m-%d')
+            formatted_date = date.strftime('%d %B %Y')
+            if await check_language_ru(message.from_user.id):
+                date = formatted_date.split(' ')
+                month = await language_text(message.from_user.id, date[1])
+                formatted_date = f'{date[0]} {month} {date[-1]}'
             if await check_language_ru(user_id):
-                response += f"{deadline_id}. {deadline} (Дата: {date}, Время: {time}, Статус: {status})\n"
+                response += f"{deadline_id}. {deadline} (Дата: {formatted_date}, Время: {time}, Статус: {status})\n"
             else:
                 status = await translate_text_to_en(status)
-                response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
+                response += f"{deadline_id}. {deadline} (Date: {formatted_date}, Time: {time}, Status: {status})\n"
 
         await message.answer(response)
     await state.clear()
@@ -148,11 +161,17 @@ async def set_new_date_for_deadline(message: Message, state: FSMContext):
         response = await language_text(user_id, response)
         response += '\n'
         for deadline_id, deadline, date, time, status in deadlines:
+            date = datetime.strptime(date, '%Y-%m-%d')
+            formatted_date = date.strftime('%d %B %Y')
             if await check_language_ru(user_id):
-                response += f"{deadline_id}. {deadline} (Дата: {date}, Время: {time}, Статус: {status})\n"
+                date = formatted_date.split(' ')
+                month = await language_text(user_id, date[1])
+                formatted_date = f'{date[0]} {month} {date[-1]}'
+            if await check_language_ru(user_id):
+                response += f"{deadline_id}. {deadline} (Дата: {formatted_date}, Время: {time}, Статус: {status})\n"
             else:
                 status = await translate_text_to_en(status)
-                response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
+                response += f"{deadline_id}. {deadline} (Date: {formatted_date}, Time: {time}, Status: {status})\n"
 
         await message.answer(response)
     await state.clear()
