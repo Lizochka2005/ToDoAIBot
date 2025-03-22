@@ -48,13 +48,16 @@ async def send_voice(call: CallbackQuery, state: FSMContext):
         ans = data.get("answer_ru")
     else:
         ans = data.get("answer_en")
-    text_to_speech(ans, lan)
+    # text_to_speech(ans, lan)
+
     try:
+        voice_path = await text_to_speech(call.message.text, 1.25, lan)
         # Отправляем голосовое сообщение
-        voice = FSInputFile("output.mp3")
+        voice = FSInputFile(voice_path)
         await call.message.answer_voice(voice=voice)
+
         # Удаляем временный OGG
-        os.remove("output.mp3")
+        os.remove(voice_path)
     except Exception as e:
         text = "Unable to convert to voice message :("
         text = await language_text(call.from_user.id, text)

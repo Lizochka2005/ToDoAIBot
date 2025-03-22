@@ -22,7 +22,7 @@ async def user_question(message: Message, state: FSMContext):
     if await check_language_ru(message.from_user.id):
         await message.answer(text, reply_markup=kb.quest_ru)
     else:
-        await message.answer(text, reply_markup=kb.quest_ru)
+        await message.answer(text, reply_markup=kb.quest_en)
 
 
 @answer_question.message(Question.text)
@@ -36,7 +36,7 @@ async def llm_answer(message: Message, state: FSMContext):
             chosen_language = "Английский"
         llm_promt = await language_text(
             message.from_user.id,
-            message.text + f" для ответа используй {chosen_language} язык"
+            str(message.text) + f" для ответа используй {chosen_language} язык"
         )
         ans = llm.invoke(llm_promt).content
         print("Ответ получен")
@@ -87,7 +87,7 @@ async def voice_handler(message: Message, state: FSMContext):
                     chosen_language = "Английский"
                 llm_promt = await language_text(
                     message.from_user.id,
-                    message.text + f" для ответа используй {chosen_language} язык"
+                    str(text) + f" для ответа используй {chosen_language} язык"
                 )
                 ans = llm.invoke(llm_promt).content
                 print("Ответ получен")
