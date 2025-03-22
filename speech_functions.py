@@ -4,7 +4,7 @@ import os
 # from googletrans import Translator
 from translate import Translator
 import asyncio
-import whisper
+# import whisper
 # import speech_recognition as sr
 # from pydub import AudioSegment
 import aiosqlite
@@ -56,10 +56,10 @@ async def translate_text_to_en(text):
         print("Переводчик не робит :(")
         print(f"Произошла ошибка: {e}")
 
-async def recognize_speech(audio_path, language="ru"):
-    model = whisper.load_model("base")
-    result = model.transcribe(audio_path, language=language)
-    return result["text"].strip()
+# async def recognize_speech(audio_path, language="ru"):
+#     model = whisper.load_model("base")
+#     result = model.transcribe(audio_path, language=language)
+#     return result["text"].strip()
 
 # async def recognize_speech(audio_path, language):
 #     recognizer = sr.Recognizer()

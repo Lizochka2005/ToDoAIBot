@@ -78,7 +78,7 @@ async def send_reminders_task(diff = 0):
             for row in rows:
                 user_id = row[0]
                 async with db.execute(
-                    "SELECT task, time, status FROM tasks WHERE user_id = ? AND date = ? AND time = ?",
+                    "SELECT id, task, time, status FROM tasks WHERE user_id = ? AND date = ? AND time = ?",
                     (user_id, date, (curr_time+timedelta(minutes=diff)).strftime('%H:%M'), )
                 ) as cursor:
                     tasks = await cursor.fetchall()
@@ -89,20 +89,20 @@ async def send_reminders_task(diff = 0):
                     response = f"Your tasks starts in {diff} minutes:"
                     response = await language_text(user_id, response)
                     response+='\n'
-                    for task, time, status in tasks:
+                    for id, task, time, status in tasks:
                         if await check_language_ru(user_id):
                             response += f"- {task} (Статус: {status}, Время: {time})\n"
                         else:
                             status = await translate_text_to_en(status)
                             response += f"- {task} (Status: {status}, Time: {time})\n"
 
-                    if diff == 0:
-                        if await check_language_ru(user_id):
-                            await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.update_status_task_ru)
+                        if diff == 0:
+                            if await check_language_ru(user_id):
+                                await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.create_task_status_ru(id))
+                            else:
+                                await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.create_task_status_en(id))
                         else:
-                            await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.update_status_task_en)
-                    else:
-                        await bot.send_message(chat_id=user_id,text=response)
+                            await bot.send_message(chat_id=user_id,text=response)
 
 async def send_reminders_deadline(diff = 0):
     curr_time = datetime.now()
@@ -115,7 +115,7 @@ async def send_reminders_deadline(diff = 0):
             for row in rows:
                 user_id = row[0]
                 async with db.execute(
-                    "SELECT deadline, time, status FROM deadlines WHERE user_id = ? AND date = ? AND time = ?",
+                    "SELECT id, deadline, time, status FROM deadlines WHERE user_id = ? AND date = ? AND time = ?",
                     (user_id, date, (curr_time+timedelta(minutes=diff)).strftime('%H:%M'), )
                 ) as cursor:
                     deadlines = await cursor.fetchall()
@@ -126,20 +126,20 @@ async def send_reminders_deadline(diff = 0):
                     response = f"Your deadlines starts in {diff} minutes:"
                     response = await language_text(user_id, response)
                     response+='\n'
-                    for deadline, time, status in deadlines:
+                    for id, deadline, time, status in deadlines:
                         if await check_language_ru(user_id):
                             response += f"- {deadline} (Статус: {status}, Время: {time})\n"
                         else:
                             status = await translate_text_to_en(status)
                             response += f"- {deadline} (Status: {status}, Time: {time})\n"
 
-                    if diff == 0:
-                        if await check_language_ru(user_id):
-                            await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.update_deadline_ru)
+                        if diff == 0:
+                            if await check_language_ru(user_id):
+                                await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.create_deadline_status_ru(id))
+                            else:
+                                await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.create_deadline_status_en(id))
                         else:
-                            await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.update_deadline_en)
-                    else:
-                        await bot.send_message(chat_id=user_id,text=response)
+                            await bot.send_message(chat_id=user_id,text=response)
 
 async def send_reminders_statistic():
     curr_time = datetime.now()

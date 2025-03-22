@@ -12,11 +12,11 @@ from speech_functions import *
 my_nearest_deadlines = Router()
 
 
-@my_nearest_deadlines.message(Command("my_nearest_deadlines"), Registration.confirmed)
+@my_nearest_deadlines.message(Command("my_nearest_deadlines"))
 async def show_tasks_for_today(message: Message):
     user_id = message.from_user.id
     async with aiosqlite.connect('users.db') as db:
-      async with db.execute("SELECT deadline, date, time FROM deadlines WHERE user_id=? and status not like('Завершён')", (user_id,)) as cursor:
+      async with db.execute("SELECT deadline, date, time FROM deadlines WHERE user_id=? and status not like('Завершён') ORDER BY date, time", (user_id,)) as cursor:
         deadlines = await cursor.fetchall()
 
         if not deadlines:
@@ -31,3 +31,4 @@ async def show_tasks_for_today(message: Message):
         
         response = await language_text(user_id, response)
         await message.answer(response)
+

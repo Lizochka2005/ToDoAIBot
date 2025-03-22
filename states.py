@@ -7,7 +7,6 @@ class Question(StatesGroup):
 class Registration(StatesGroup):
     waiting_for_name = State()
     waiting_for_language = State()
-    # confirmed = State()
 
 class UpdateRegistration(StatesGroup):
     waiting_for_new_name = State()

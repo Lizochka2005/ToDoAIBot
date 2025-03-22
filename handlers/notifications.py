@@ -18,7 +18,7 @@ notifications = Router()
 #     else:
 #         await message.answer(text, reply_markup=kb.setNotifications_en,)
 
-@notifications.message(Command("notifications_on"), Registration.confirmed)
+@notifications.message(Command("notifications_on"))
 async def enable_notifications(message: Message):
     async with aiosqlite.connect("users.db") as db:
         await db.execute(
@@ -31,7 +31,7 @@ async def enable_notifications(message: Message):
     text = await language_text(message.from_user.id, text)
     await message.answer(text)
 
-@notifications.message(Command("notifications_off"), Registration.confirmed)
+@notifications.message(Command("notifications_off"))
 async def disable_notifications(message: Message):
     async with aiosqlite.connect("users.db") as db:
         await db.execute(

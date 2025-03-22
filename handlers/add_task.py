@@ -4,6 +4,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram import Router
 from aiogram_dialog import DialogManager, StartMode
+from datetime import datetime
 
 from speech_functions import *
 from states import TaskCreation, Question, Registration, MySG
@@ -54,20 +55,26 @@ async def process_time(message: Message, state: FSMContext):
       text = 'Incorrect time, please try again!'
       text = await language_text(message.from_user.id, text)
       await message.answer(text)
-      await state.set_state(Registration.confirmed)
-      return
+      text = 'Enter time in format HH:MM'
+      text = await language_text(message.from_user.id, text)
+      await message.answer(text)
+      await state.set_state(TaskCreation.waiting_for_time)
     elif (a[0][:1]!=0 and int(a[0])>24) or (a[1][:1]!=0 and int(a[1])>=60):
       text = 'Incorrect time, please try again!'
       text = await language_text(message.from_user.id, text)
       await message.answer(text)
-      await state.set_state(Registration.confirmed)
-      return
+      text = 'Enter time in format HH:MM'
+      text = await language_text(message.from_user.id, text)
+      await message.answer(text)
+      await state.set_state(TaskCreation.waiting_for_time)
   except Exception as e:
     text = 'Incorrect time, please try again!'
     text = await language_text(message.from_user.id, text)
     await message.answer(text)
-    await state.set_state(Registration.confirmed)
-    return
+    text = 'Enter time in format HH:MM'
+    text = await language_text(message.from_user.id, text)
+    await message.answer(text)
+    await state.set_state(TaskCreation.waiting_for_time)
 
   async with aiosqlite.connect("users.db") as db:
         await db.execute(
@@ -75,6 +82,13 @@ async def process_time(message: Message, state: FSMContext):
             (message.from_user.id, task, data, time),
         )
         await db.commit()
+
+  date = datetime.strptime(date, '%Y-%m-%d')
+  formatted_date = date.strftime('%d %B %Y')
+  if await check_language_ru(message.from_user.id):
+    date = formatted_date.split(' ')
+    month = await language_text(message.from_user.id, date[1])
+    formatted_date = f'{date[0]} {month} {date[-1]}'
 
   text1 = "Task added!"
   text1 = await language_text(message.from_user.id, text1)
@@ -84,6 +98,6 @@ async def process_time(message: Message, state: FSMContext):
   text3 = await language_text(message.from_user.id, text3)
   text4 = 'Time'
   text4 = await language_text(message.from_user.id, text4)
-  text = f'{text1}\n{text2} {task}\n{text3} {data}\n{text4} {time}'
+  text = f'{text1}\n{text2} {task}\n{text3} {formatted_date}\n{text4} {time}'
   await message.answer(text)
-  await state.set_state(Registration.confirmed)
+  await state.clear()

@@ -6,6 +6,7 @@ import os
 from aiogram import Router, F
 from aiogram_dialog import DialogManager, StartMode
 from initialisation import bot
+from handlers.start import *
 from states import *
 
 from speech_functions import *
@@ -32,8 +33,19 @@ callbacks = Router()
 #         await call.message.answer(text, reply_markup=builder.as_markup())
 #     except Exception as e:
 #         await call.message.answer("Прошу прощения, текст оказался слишком большой :)")
-    
 
+@callbacks.callback_query(lambda callback: callback.data == "lan ru")
+async def lan_ru(call: CallbackQuery, state: FSMContext):
+    await state.update_data(lan='ru')
+    await state.set_state(Registration.waiting_for_language)
+    await process_language(call.message, state)
+
+
+@callbacks.callback_query(lambda callback: callback.data == "lan en")
+async def lan_ru(call: CallbackQuery, state: FSMContext):
+    await state.update_data(lan='en')
+    await state.set_state(Registration.waiting_for_language)
+    await process_language(call.message, state)
 
 @callbacks.callback_query(lambda callback: callback.data == "Озвучить")
 async def send_voice(call: CallbackQuery, state: FSMContext):
@@ -111,28 +123,31 @@ async def update_task_date(call: CallbackQuery, state: FSMContext, dialog_manage
     await state.set_state(TaskUpdate.waiting_for_new_date)
 
 @callbacks.callback_query(lambda callback: callback.data == "статус дэдлайн")
-async def update_deadline_date(call: CallbackQuery):
+async def update_deadline_date(call: CallbackQuery, state: FSMContext):
     text = 'Enter new status for the deadline:'
     text = await language_text(call.from_user.id, text)
+    user_data = await state.get_data()
+    id = user_data['deadline_id']
     if await check_language_ru(call.from_user.id):
-        await call.message.answer(text, reply_markup=kb.update_status_deadline_ru)
+        await call.message.answer(text, reply_markup=kb.create_deadline_status_ru(id))
     else:
-        await call.message.answer(text, reply_markup=kb.update_status_deadline_en)
+        await call.message.answer(text, reply_markup=kb.create_deadline_status_en(id))
 
 @callbacks.callback_query(lambda callback: callback.data == "статус задача")
-async def update_task_date(call: CallbackQuery):
+async def update_task_date(call: CallbackQuery, state: FSMContext):
     text = 'Enter new status for the task:'
     text = await language_text(call.from_user.id, text)
-    if await check_language_ru(call.from_user.id):
-        await call.message.answer(text, reply_markup=kb.update_status_task_ru)
-    else:
-        await call.message.answer(text, reply_markup=kb.update_status_task_en)
-
-@callbacks.callback_query(lambda callback: callback.data == "completed task")
-async def update_task_status_completed(call: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    id = user_data['task_id']
+    if await check_language_ru(call.from_user.id):
+        await call.message.answer(text, reply_markup=kb.create_task_status_ru(id))
+    else:
+        await call.message.answer(text, reply_markup=kb.create_task_status_en(id))
+
+@callbacks.callback_query(F.data.startswith("completed task_"))
+async def update_task_status_completed(call: CallbackQuery, state: FSMContext):
     user_id = call.from_user.id
-    id = user_data["task_id"]
+    id = int(call.data.split("_")[-1])
     async with aiosqlite.connect("users.db") as db:
         await db.execute(
             "UPDATE tasks SET status = 'Выполнено' WHERE id=?", ( id,),
@@ -156,13 +171,12 @@ async def update_task_status_completed(call: CallbackQuery, state: FSMContext):
                 response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
 
         await call.message.answer(response)
-        await state.set_state(Registration.confirmed)
+        await state.clear()
 
-@callbacks.callback_query(lambda callback: callback.data == "partially completed task")
+@callbacks.callback_query(F.data.startswith("partially completed task_"))
 async def update_task_status_part_completed(call: CallbackQuery, state: FSMContext):
-    user_data = await state.get_data()
     user_id = call.from_user.id
-    id = user_data["task_id"]
+    id = int(call.data.split("_")[-1])
     async with aiosqlite.connect("users.db") as db:
         await db.execute(
             "UPDATE tasks SET status = 'Частично выполнено' WHERE id=?", ( id,),
@@ -186,13 +200,12 @@ async def update_task_status_part_completed(call: CallbackQuery, state: FSMConte
                 response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
 
         await call.message.answer(response)
-        await state.set_state(Registration.confirmed)
+        await state.clear()
 
-@callbacks.callback_query(lambda callback: callback.data == "not completed task")
+@callbacks.callback_query(F.data.startswith("not completed task_"))
 async def update_task_status_not_completed(call: CallbackQuery, state: FSMContext):
-    user_data = await state.get_data()
     user_id = call.from_user.id
-    id = user_data["task_id"]
+    id = int(call.data.split("_")[-1])
     async with aiosqlite.connect("users.db") as db:
         await db.execute(
             "UPDATE tasks SET status = 'Не выполнено' WHERE id=?", ( id,),
@@ -216,14 +229,13 @@ async def update_task_status_not_completed(call: CallbackQuery, state: FSMContex
                 response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
 
         await call.message.answer(response)
-        await state.set_state(Registration.confirmed)
+        await state.clear()
 
 
-@callbacks.callback_query(lambda callback: callback.data == "not completed deadline")
+@callbacks.callback_query(F.data.startswith("not completed deadline_"))
 async def update_task_status_not_completed(call: CallbackQuery, state: FSMContext):
-    user_data = await state.get_data()
     user_id = call.from_user.id
-    id = user_data["deadline_id"]
+    id = int(call.data.split("_")[-1])
     async with aiosqlite.connect("users.db") as db:
         await db.execute(
             "UPDATE deadlines SET status = 'Не завершён' WHERE id=?", ( id,),
@@ -247,13 +259,13 @@ async def update_task_status_not_completed(call: CallbackQuery, state: FSMContex
                 response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
 
         await call.message.answer(response)
-        await state.set_state(Registration.confirmed)
+        await state.clear()
 
-@callbacks.callback_query(lambda callback: callback.data == "completed deadline")
+
+@callbacks.callback_query(F.data.startswith("completed deadline_"))
 async def update_task_status_not_completed(call: CallbackQuery, state: FSMContext):
-    user_data = await state.get_data()
     user_id = call.from_user.id
-    id = user_data["deadline_id"]
+    id = int(call.data.split("_")[-1])
     async with aiosqlite.connect("users.db") as db:
         await db.execute(
             "UPDATE deadlines SET status = 'Завершён' WHERE id=?", ( id,),
@@ -277,7 +289,8 @@ async def update_task_status_not_completed(call: CallbackQuery, state: FSMContex
                 response += f"{deadline_id}. {deadline} (Date: {date}, Time: {time}, Status: {status})\n"
 
         await call.message.answer(response)
-        await state.set_state(Registration.confirmed)
+        await state.clear()
+
 
 @callbacks.callback_query(EditProfile.waiting_for_choice, F.data.in_(["edit_name", "edit_language"]))
 async def process_edit_choice(call: CallbackQuery, state: FSMContext):
@@ -300,12 +313,10 @@ async def process_edit_choice(call: CallbackQuery, state: FSMContext):
                     text = 'Language successfully changed to'
                     text = await language_text(user_id, text)
                     await call.message.answer(text + ' ' + new_language+'.')
-                    await state.set_state(Registration.confirmed)
                 else:
                     text = 'Profile is not found.'
                     text = await language_text(user_id, text)
                     await call.message.answer(text)
-                    await state.set_state(Registration.confirmed)
     await call.answer()
 
 @callbacks.callback_query(lambda callback: callback.data == "voice enter")

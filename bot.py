@@ -22,10 +22,10 @@ import ctypes
 
 from states import Question
 from database.database_and_functions_GetStatistics import start_db
-
 # from handlers.calendar_start import calendar_start
 from handlers.add_deadline import add_deadline
 from handlers.add_task import add_task
+from handlers.my_nearest_deadlines import my_nearest_deadlines
 from handlers.my_nearest_deadlines import my_nearest_deadlines
 from handlers.my_tasks_for_date import my_tasks_for_date
 from handlers.my_tasks_for_today import my_tasks_for_today
@@ -33,7 +33,6 @@ from handlers.start import start
 from handlers.update_deadline import update_deadline
 from handlers.update_task import update_task
 from handlers.callbacks import callbacks
-
 # from handlers.answer_voice_message import answer_voice_message
 from handlers.default_handler import default_handler
 from handlers.answer_question import answer_question

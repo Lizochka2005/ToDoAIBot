@@ -9,7 +9,7 @@ import keyboards as kb
 
 edit_profile = Router()
 
-@edit_profile.message(Command("edit_profile"), Registration.confirmed)
+@edit_profile.message(Command("edit_profile"))
 async def edit_profile_cmd(message: Message, state: FSMContext):
     user_id = message.from_user.id
     async with aiosqlite.connect('users.db') as db:
@@ -49,4 +49,4 @@ async def process_new_name(message: Message, state: FSMContext):
     text = 'Name successfully changed to'
     text = await language_text(user_id, text)
     await message.answer(text + ' ' + safe_name +'.')
-    await state.set_state(Registration.confirmed)
+    await state.clear()

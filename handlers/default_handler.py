@@ -9,10 +9,6 @@ default_handler = Router()
 # реакция на любое действие
 @default_handler.message(flags={"priority": -100})
 async def answerForEverything(message: Message, state: FSMContext):
-    if state is None:
-        text = 'You have no registration.😓 Please register your account!'
-    else:
-        text = "Don't know what to answer😓 Try using commands or use command"
-        text = await language_text(message.from_user.id, text)
-        text += ' /start.'
+    text = "Don't know what to answer😓 Try using commands."
+    text = await language_text(message.from_user.id, text)
     await message.answer(text)

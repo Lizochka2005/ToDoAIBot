@@ -13,7 +13,7 @@ from aiogram import Router
 my_tasks_for_date = Router()
 
 
-@my_tasks_for_date.message(Command("my_tasks_for_date"), Registration.confirmed)
+@my_tasks_for_date.message(Command("my_tasks_for_date"))
 async def ask_for_date(message: Message, state: FSMContext, dialog_manager: DialogManager):
     text = 'Choose the date:'
     text = await language_text(message.from_user.id, text)
@@ -32,7 +32,7 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
 
     async with aiosqlite.connect("users.db") as db:
         async with db.execute(
-            "SELECT task, status, date, time FROM tasks WHERE user_id=? and date=?",
+            "SELECT task, status, date, time FROM tasks WHERE user_id=? and date=? ORDER BY time",
             (
                 user_id,
                 date,
@@ -44,7 +44,6 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
                 text = f'You have no tasks on {date}'
                 text = await language_text(user_id, text)
                 await message.answer(text)
-                await state.set_state(Registration.confirmed)
                 return
 
             response = f"Your tasks on {date}:"
@@ -58,4 +57,5 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
                     response += f"- {task} (Status: {status}, Time: {time})\n"
             
             await message.answer(response)
-            await state.set_state(Registration.confirmed)
+    await state.clear()
+

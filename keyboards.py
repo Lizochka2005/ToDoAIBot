@@ -1,11 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-from aiogram.utils.keyboard import (
-    InlineKeyboardBuilder,
-    ReplyKeyboardBuilder,
-    KeyboardButton,
-)
-from aiogram import Bot
-from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 say_en = InlineKeyboardMarkup(
@@ -64,7 +58,7 @@ commands = [
     "update_task",
     "notifications_on",
     "notifications_off",
-    "edit_profile",
+    "edit_profile"
 ]
 
 
@@ -75,14 +69,12 @@ def show_commands_ru():
         bot_commands += "/" + command + "\n"
     return bot_commands
 
-
 def show_commands_en():
     # вывод команд бота
     bot_commands = "Bot has commands:\n"
     for command in commands:
         bot_commands += "/" + command + "\n"
     return bot_commands
-
 
 setNotifications_ru = InlineKeyboardBuilder()
 setNotifications_ru.add(InlineKeyboardButton(text="Включить", callback_data="able"))
@@ -97,19 +89,13 @@ setNotifications_en = setNotifications_en.adjust(2).as_markup()
 update_deadline_en = InlineKeyboardBuilder()
 update_deadline_en.add(InlineKeyboardButton(text="Time", callback_data="время дэдлайн"))
 update_deadline_en.add(InlineKeyboardButton(text="Date", callback_data="дата дэдлайн"))
-update_deadline_en.add(
-    InlineKeyboardButton(text="Status", callback_data="статус дэдлайн")
-)
+update_deadline_en.add(InlineKeyboardButton(text="Status", callback_data="статус дэдлайн"))
 update_deadline_en = update_deadline_en.adjust(3).as_markup()
 
 update_deadline_ru = InlineKeyboardBuilder()
-update_deadline_ru.add(
-    InlineKeyboardButton(text="Время", callback_data="время дэдлайн")
-)
+update_deadline_ru.add(InlineKeyboardButton(text="Время", callback_data="время дэдлайн"))
 update_deadline_ru.add(InlineKeyboardButton(text="Дата", callback_data="дата дэдлайн"))
-update_deadline_ru.add(
-    InlineKeyboardButton(text="Статус", callback_data="статус дэдлайн")
-)
+update_deadline_ru.add(InlineKeyboardButton(text="Статус", callback_data="статус дэдлайн"))
 update_deadline_ru = update_deadline_ru.adjust(3).as_markup()
 
 update_task_en = InlineKeyboardBuilder()
@@ -124,51 +110,33 @@ update_task_ru.add(InlineKeyboardButton(text="Дата", callback_data="дата
 update_task_ru.add(InlineKeyboardButton(text="Статус", callback_data="статус задача"))
 update_task_ru = update_task_ru.adjust(3).as_markup()
 
-update_status_task_en = InlineKeyboardBuilder()
-update_status_task_en.add(
-    InlineKeyboardButton(text="Completed", callback_data="completed task")
-)
-update_status_task_en.add(
-    InlineKeyboardButton(
-        text="Partially completed", callback_data="partially completed task"
-    )
-)
-update_status_task_en.add(
-    InlineKeyboardButton(text="Not completed", callback_data="not completed task")
-)
-update_status_task_en = update_status_task_en.adjust(3).as_markup()
+def create_task_status_en(task_id):
+    update_status_task_en = InlineKeyboardBuilder()
+    update_status_task_en.add(InlineKeyboardButton(text="Completed", callback_data=f"completed task_{task_id}"))
+    update_status_task_en.add(InlineKeyboardButton(text="Partially completed", callback_data=f"partially completed task_{task_id}"))
+    update_status_task_en.add(InlineKeyboardButton(text="Not completed", callback_data="not completed task_{task_id}"))
+    return update_status_task_en
 
-update_status_task_ru = InlineKeyboardBuilder()
-update_status_task_ru.add(
-    InlineKeyboardButton(text="Выполнено", callback_data="completed task")
-)
-update_status_task_ru.add(
-    InlineKeyboardButton(
-        text="Частично выполнено", callback_data="partially completed task"
-    )
-)
-update_status_task_ru.add(
-    InlineKeyboardButton(text="Не выполнено", callback_data="not completed task")
-)
-update_status_task_ru = update_status_task_ru.adjust(3).as_markup()
+def create_task_status_ru(task_id):
+    update_status_task_ru = InlineKeyboardBuilder()
+    update_status_task_ru.add(InlineKeyboardButton(text="Выполнено", callback_data=f"completed task_{task_id}"))
+    update_status_task_ru.add(InlineKeyboardButton(text="Частично выполнено", callback_data=f"partially completed task_{task_id}"))
+    update_status_task_ru.add(InlineKeyboardButton(text="Не выполнено", callback_data=f"not completed task_{task_id}"))
+    return update_status_task_ru
 
-update_status_deadline_en = InlineKeyboardBuilder()
-update_status_deadline_en.add(
-    InlineKeyboardButton(text="Completed", callback_data="completed deadline")
-)
-update_status_deadline_en.add(
-    InlineKeyboardButton(text="Not completed", callback_data="not completed deadline")
-)
-update_status_deadline_en = update_status_deadline_en.adjust(2).as_markup()
+def create_deadline_status_en(deadline_id):
+    update_status_deadline_en = InlineKeyboardBuilder()
+    update_status_deadline_en.add(InlineKeyboardButton(text="Completed", callback_data=f"completed deadline_{deadline_id}"))
+    update_status_deadline_en.add(InlineKeyboardButton(text="Not completed", callback_data=f"not completed deadline_{deadline_id}"))
+    update_status_deadline_en = update_status_deadline_en.adjust(2).as_markup()
+    return update_status_deadline_en
 
-update_status_deadline_ru = InlineKeyboardBuilder()
-update_status_deadline_ru.add(
-    InlineKeyboardButton(text="Завершён", callback_data="completed deadline")
-)
-update_status_deadline_ru.add(
-    InlineKeyboardButton(text="Не завершён", callback_data="not completed deadline")
-)
-update_status_deadline_ru = update_status_deadline_ru.adjust(2).as_markup()
+def create_deadline_status_ru(deadline_id):
+    update_status_deadline_ru = InlineKeyboardBuilder()
+    update_status_deadline_ru.add(InlineKeyboardButton(text="Завершён", callback_data=f"completed deadline_{deadline_id}"))
+    update_status_deadline_ru.add(InlineKeyboardButton(text="Не завершён", callback_data=f"not completed deadline_{deadline_id}"))
+    update_status_deadline_ru = update_status_deadline_ru.adjust(2).as_markup()
+    return update_status_deadline_ru
 
 edit_profile_ru = InlineKeyboardBuilder()
 edit_profile_ru.add(InlineKeyboardButton(text="Имя", callback_data="edit_name"))
@@ -177,9 +145,7 @@ edit_profile_ru = edit_profile_ru.adjust(2).as_markup()
 
 edit_profile_en = InlineKeyboardBuilder()
 edit_profile_en.add(InlineKeyboardButton(text="Name", callback_data="edit_name"))
-edit_profile_en.add(
-    InlineKeyboardButton(text="Language", callback_data="edit_language")
-)
+edit_profile_en.add(InlineKeyboardButton(text="Language", callback_data="edit_language"))
 edit_profile_en = edit_profile_en.adjust(2).as_markup()
 
 quest_ru = InlineKeyboardBuilder()
@@ -193,9 +159,7 @@ quest_en.add(InlineKeyboardButton(text="Text input", callback_data="text enter")
 quest_en = quest_en.adjust(2).as_markup()
 
 
-choose_language = ReplyKeyboardBuilder()
-choose_language.add(KeyboardButton(text="ru"))
-choose_language.add(KeyboardButton(text="en"))
-choose_language = choose_language.as_markup(
-    resize_keyboard=True, one_time_keyboard=True
-)
+registration_lan= InlineKeyboardBuilder()
+registration_lan.add(InlineKeyboardButton(text="ru", callback_data="lan ru"))
+registration_lan.add(InlineKeyboardButton(text="en", callback_data="lan en "))
+registration_lan = registration_lan.adjust(2).as_markup()
