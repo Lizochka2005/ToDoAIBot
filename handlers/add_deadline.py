@@ -51,7 +51,7 @@ async def process_time(message: Message, state: FSMContext):
     time = message.text
     user_data = await state.get_data()
     deadline = user_data["deadline"]
-    data = user_data["data"]
+    data = str(user_data["data"])
     time = message.text
     try:
         a = time.split(":")
