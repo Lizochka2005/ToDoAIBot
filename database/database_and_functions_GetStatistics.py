@@ -3,6 +3,7 @@ import asyncio
 import datetime
 
 async def start_db():
+    """Создает таблицы users, tasks, deadlines в базе данных users если их еще нет"""
     async with aiosqlite.connect("users.db") as db:
         await db.execute('''CREATE TABLE IF NOT EXISTS users (
                         user_id INTEGER PRIMARY KEY,
@@ -17,14 +18,14 @@ async def start_db():
                       date TEXT,
                       time TEXT,
                       FOREIGN KEY (user_id) REFERENCES users(user_id))''')
-        await db.execute('''CREATE TABLE IF NOT EXISTS deadlines (
-                      id INTEGER PRIMARY KEY AUTOINCREMENT,
-                      user_id INTEGER,
-                      deadline TEXT,
-                      status TEXT DEFAULT 'Не завершён',
-                      date TEXT,
-                      time TEXT,
-                      FOREIGN KEY (user_id) REFERENCES users(user_id))''')
+        # await db.execute('''CREATE TABLE IF NOT EXISTS deadlines (
+        #               id INTEGER PRIMARY KEY AUTOINCREMENT,
+        #               user_id INTEGER,
+        #               deadline TEXT,
+        #               status TEXT DEFAULT 'Не завершён',
+        #               date TEXT,
+        #               time TEXT,
+        #               FOREIGN KEY (user_id) REFERENCES users(user_id))''')
 
         await db.commit()
 

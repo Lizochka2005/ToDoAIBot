@@ -1,12 +1,13 @@
 from aiogram import Router, F
-from aiogram.filters import CommandStart, Command, CommandObject
-from aiogram.types import Message, FSInputFile
+from aiogram.filters import Command
+from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram_dialog import DialogManager, StartMode
 import aiosqlite
 
-from states import Question, GetTaskListForDate, Registration, MySG
-from speech_functions import *
+from states import  GetTaskListForDate, MySG
+from speech_functions import language_text, check_language_ru, translate_text_to_en
+from datetime import datetime
 
 from aiogram import Router
 
@@ -27,7 +28,7 @@ async def ask_for_date(message: Message, state: FSMContext, dialog_manager: Dial
 @my_tasks_for_date.message(GetTaskListForDate.waiting_for_date)
 async def show_tasks_for_date(message: Message, state: FSMContext):
     user_data = await state.get_data()
-    date = user_data['data']
+    date = user_data['date']
     user_id = user_data['user_id']
 
     async with aiosqlite.connect("users.db") as db:
@@ -46,7 +47,13 @@ async def show_tasks_for_date(message: Message, state: FSMContext):
                 await message.answer(text)
                 return
 
-            response = f"Your tasks on {date}:"
+            date = datetime.strptime(date, '%Y-%m-%d')
+            formatted_date = date.strftime('%d %B %Y')
+            if await check_language_ru(message.from_user.id):
+                date = formatted_date.split(' ')
+                month = await language_text(message.from_user.id, date[1])
+                formatted_date = f'{date[0]} {month} {date[-1]}'
+            response = f"Your tasks on {formatted_date}:"
             response = await language_text(user_id, response)
             response += '\n'
             for task, status, date, time in tasks:

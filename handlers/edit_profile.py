@@ -1,10 +1,11 @@
 from aiogram import Router, F
-from aiogram.filters import CommandStart, Command, CommandObject
-from aiogram.types import Message, FSInputFile
+from aiogram.filters import Command
+from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
-from states import Question, Registration, EditProfile
-from speech_functions import *
+from states import EditProfile
+from speech_functions import language_text, check_language_ru
+import aiosqlite
 import keyboards as kb
 
 edit_profile = Router()

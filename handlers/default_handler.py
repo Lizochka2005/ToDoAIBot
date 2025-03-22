@@ -1,6 +1,6 @@
 from aiogram import Router
 from aiogram.types import Message
-from speech_functions import *
+from speech_functions import language_text
 from aiogram.fsm.context import FSMContext
 
 default_handler = Router()

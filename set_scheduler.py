@@ -1,4 +1,4 @@
-from send_reminders import *
+from send_reminders import send_morning_reminders, send_reminders_1_hour_before, send_reminders_30_minutes_before, send_reminders_15_minutes_before, send_reminders_at_start, send_evening_reminders
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
