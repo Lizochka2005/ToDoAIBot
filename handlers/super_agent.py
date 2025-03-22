@@ -11,11 +11,11 @@ from langchain.chains import LLMChain
 import os
 from aiogram.fsm.context import FSMContext
 
-from speech_functions import recognize_speech, check_language_ru
 from initialisation import llm
 from initialisation import llm
 import keyboards as kb
-from speech_functions import recognize_speech, language_text, check_language_ru
+from speech_functions import recognize_speech
+from speech_functions import language_text, check_language_ru
 
 
 super_agent = Router()
@@ -114,9 +114,14 @@ class AddTask:
         except Exception as e:
             print(f"Ошибка добавления задачи агентом:\n{str(e)}")
             return None
-        await message.answer(
-            f"Задача создана: {params['task']} {params['date']} в {params['time']}"
-        )
+        if await check_language_ru(user_id):
+            await message.answer(
+                f"Задача создана: {params['task']} {params['date']} в {params['time']}"
+            )
+        else:
+            await message.answer(
+                f"Task was created: {params['task']} {params['date']} at {params['time']}"
+            )
 
 
 class UpdateTask:
@@ -148,9 +153,14 @@ class UpdateTask:
         except Exception as e:
             print(f"Ошибка обновления задачи агентом:\n{str(e)}")
             return None
-        await message.answer(
-            f"Задача обновлена: {params['task']} {params['date']} в {params['time']}, статус: {params['status']}"
-        )
+        if await check_language_ru(user_id):
+            await message.answer(
+                f"Задача обновлена: {params['task']} {params['date']} в {params['time']}, статус: {params['status']}"
+            )
+        else:
+            await message.answer(
+                f"Task was updates: {params['task']} {params['date']} at {params['time']}, status: {params['status']}"
+            )
 
 
 class AskLlm:
@@ -205,7 +215,9 @@ class Notifications:
                         (user_id,),
                     )
                     await db.commit()
-                await message.answer("Уведомления включены")
+                text = 'Уведомления включены'
+                text = await language_text(user_id, text)
+                await message.answer(text)
                 print("Уведомления включены")
             elif params["notifications"] == str(False):
                 async with aiosqlite.connect("users.db") as db:
@@ -214,8 +226,10 @@ class Notifications:
                         (user_id,),
                     )
                     await db.commit()
-                await message.answer("Уведомления выключены")
-                print("Уведомления выкключены")
+                text = 'Уведомления выключены'
+                text = await language_text(user_id, text)
+                await message.answer(text)
+                print("Уведомления выключены")
         except Exception as e:
             print(f"Ошибка включения/выключения уведомлений агентом:\n{str(e)}")
             return None

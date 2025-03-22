@@ -1,4 +1,5 @@
-from gtts import gTTS
+# from gtts import gTTS
+import pyttsx3
 import os
 from translate import Translator
 import whisper
@@ -8,22 +9,36 @@ import aiosqlite
 from pydub import AudioSegment
 
 
-async def text_to_speech(text: str, speed: float = 1.25, lang: str = "ru") -> str:
-    """Озвучивает текст, возвращает путь к голосовому"""
-    # Создаем временный файл MP3
-    tts = gTTS(text=text, lang=lang, slow=False)
-    mp3_path = "temp_voice.mp3"
-    tts.save(mp3_path)
+# async def text_to_speech(text: str, speed: float = 1.25, lang: str = "ru") -> str:
+#     """Озвучивает текст, возвращает путь к голосовому"""
+#     # Создаем временный файл MP3
+#     tts = gTTS(text=text, lang=lang, slow=False)
+#     mp3_path = "temp_voice.mp3"
+#     tts.save(mp3_path)
 
-    # Конвертируем MP3 в OGG (формат, принимаемый Telegram)
-    ogg_path = "temp_voice.ogg"
-    audio = AudioSegment.from_mp3(mp3_path)
-    audio = audio.speedup(playback_speed=speed)  # Ускоряем в 1.5 раза
-    audio.export(ogg_path, format="ogg")
+#     # Конвертируем MP3 в OGG (формат, принимаемый Telegram)
+#     ogg_path = "temp_voice.ogg"
+#     audio = AudioSegment.from_mp3(mp3_path)
+#     audio = audio.speedup(playback_speed=speed)  # Ускоряем в 1.5 раза
+#     audio.export(ogg_path, format="ogg")
 
-    # Удаляем временный MP3
-    os.remove(mp3_path)
-    return ogg_path
+#     # Удаляем временный MP3
+#     os.remove(mp3_path)
+#     return ogg_path
+
+def text_to_speech(text, lang):
+    engine = pyttsx3.init()
+
+    # Установка языка (если поддерживается)
+    voices = engine.getProperty('voices')
+    if lang == 'en':
+        engine.setProperty('voice', voices[1].id)  # Английский
+    elif lang == 'ru':
+        engine.setProperty('voice', voices[0].id)  # Русский 
+    else:
+        print(f"Язык {lang} не поддерживается. Используется язык по умолчанию.")
+    engine.save_to_file(text, 'output.mp3')
+    engine.runAndWait()
 
 
 async def recognize_speech(audio_path, language="ru"):

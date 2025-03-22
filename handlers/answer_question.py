@@ -11,7 +11,8 @@ from initialisation import llm
 from initialisation import bot
 from agent_tools import agent
 import keyboards as kb
-from speech_functions import recognize_speech, language_text, check_language_ru
+from speech_functions import recognize_speech
+from speech_functions import language_text, check_language_ru
 
 
 answer_question = Router()
@@ -39,7 +40,7 @@ async def llm_answer(message: Message, state: FSMContext):
             chosen_language = "Английский"
         llm_promt = await language_text(
             message.from_user.id,
-            message.text + f" для ответа используй {chosen_language} язык",
+            message.text + f" для ответа используй {chosen_language} язык"
         )
         ans = llm.invoke(llm_promt).content
         print("Ответ получен")
@@ -47,12 +48,10 @@ async def llm_answer(message: Message, state: FSMContext):
             await state.update_data(answer_ru=ans)
             await state.update_data(lan="ru")
             await message.answer(ans, reply_markup=kb.say_ru)
-            await state.clear()
         else:
             await state.update_data(answer_en=ans)
             await state.update_data(lan="en")
             await message.answer(ans, reply_markup=kb.say_en)
-            await state.clear()
 
     except Exception as e:
         print(f"Произошла ошибка: {e}")
