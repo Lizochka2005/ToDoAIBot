@@ -27,7 +27,7 @@ async def ask_for_date(message: Message, state: FSMContext, dialog_manager: Dial
 @my_tasks_for_date.message(GetTaskListForDate.waiting_for_date)
 async def show_tasks_for_date(message: Message, state: FSMContext):
     user_data = await state.get_data()
-    date = user_data['data']
+    date = user_data['date']
     user_id = user_data['user_id']
 
     async with aiosqlite.connect("users.db") as db:

@@ -37,35 +37,35 @@ async def send_reminders_task_day_list():
 
                     await bot.send_message(chat_id=user_id,text=response)
 
-async def send_reminders_deadline_day_list():
-    async with aiosqlite.connect("users.db") as db:
-        async with db.execute(
-            "SELECT user_id FROM users WHERE subscribed = TRUE"
-        ) as cursor:
-            rows = await cursor.fetchall()
+# async def send_reminders_deadline_day_list():
+#     async with aiosqlite.connect("users.db") as db:
+#         async with db.execute(
+#             "SELECT user_id FROM users WHERE subscribed = TRUE"
+#         ) as cursor:
+#             rows = await cursor.fetchall()
 
-            for row in rows:
-                user_id = row[0]
-                async with db.execute(
-                    "SELECT deadline, time, status FROM deadlines WHERE user_id = ? AND date = ?",
-                    (user_id, date,)
-                ) as cursor:
-                    deadlines = await cursor.fetchall()
+#             for row in rows:
+#                 user_id = row[0]
+#                 async with db.execute(
+#                     "SELECT deadline, time, status FROM deadlines WHERE user_id = ? AND date = ?",
+#                     (user_id, date,)
+#                 ) as cursor:
+#                     deadlines = await cursor.fetchall()
 
-                    if not deadlines:
-                        continue
+#                     if not deadlines:
+#                         continue
 
-                    response = f"Your tasks on {date}:"
-                    response = await language_text(user_id, response)
-                    response+='\n'
-                    for deadline, time, status in deadlines:
-                        if await check_language_ru(user_id):
-                            response += f"- {deadline} (Статус: {status}, Время: {time})\n"
-                        else:
-                            status = await translate_text_to_en(status)
-                            response += f"- {deadline} (Status: {status}, Time: {time})\n"
+#                     response = f"Your tasks on {date}:"
+#                     response = await language_text(user_id, response)
+#                     response+='\n'
+#                     for deadline, time, status in deadlines:
+#                         if await check_language_ru(user_id):
+#                             response += f"- {deadline} (Статус: {status}, Время: {time})\n"
+#                         else:
+#                             status = await translate_text_to_en(status)
+#                             response += f"- {deadline} (Status: {status}, Time: {time})\n"
 
-                    await bot.send_message(chat_id=user_id,text=response)
+#                     await bot.send_message(chat_id=user_id,text=response)
 
 async def send_reminders_task(diff = 0):
     curr_time = datetime.now()
@@ -104,42 +104,42 @@ async def send_reminders_task(diff = 0):
                         else:
                             await bot.send_message(chat_id=user_id,text=response)
 
-async def send_reminders_deadline(diff = 0):
-    curr_time = datetime.now()
-    async with aiosqlite.connect("users.db") as db:
-        async with db.execute(
-            "SELECT user_id FROM users WHERE subscribed = TRUE"
-        ) as cursor:
-            rows = await cursor.fetchall()
+# async def send_reminders_deadline(diff = 0):
+#     curr_time = datetime.now()
+#     async with aiosqlite.connect("users.db") as db:
+#         async with db.execute(
+#             "SELECT user_id FROM users WHERE subscribed = TRUE"
+#         ) as cursor:
+#             rows = await cursor.fetchall()
 
-            for row in rows:
-                user_id = row[0]
-                async with db.execute(
-                    "SELECT id, deadline, time, status FROM deadlines WHERE user_id = ? AND date = ? AND time = ?",
-                    (user_id, date, (curr_time+timedelta(minutes=diff)).strftime('%H:%M'), )
-                ) as cursor:
-                    deadlines = await cursor.fetchall()
+#             for row in rows:
+#                 user_id = row[0]
+#                 async with db.execute(
+#                     "SELECT id, deadline, time, status FROM deadlines WHERE user_id = ? AND date = ? AND time = ?",
+#                     (user_id, date, (curr_time+timedelta(minutes=diff)).strftime('%H:%M'), )
+#                 ) as cursor:
+#                     deadlines = await cursor.fetchall()
 
-                    if not deadlines:
-                        continue
+#                     if not deadlines:
+#                         continue
 
-                    response = f"Your deadlines starts in {diff} minutes:"
-                    response = await language_text(user_id, response)
-                    response+='\n'
-                    for id, deadline, time, status in deadlines:
-                        if await check_language_ru(user_id):
-                            response += f"- {deadline} (Статус: {status}, Время: {time})\n"
-                        else:
-                            status = await translate_text_to_en(status)
-                            response += f"- {deadline} (Status: {status}, Time: {time})\n"
+#                     response = f"Your deadlines starts in {diff} minutes:"
+#                     response = await language_text(user_id, response)
+#                     response+='\n'
+#                     for id, deadline, time, status in deadlines:
+#                         if await check_language_ru(user_id):
+#                             response += f"- {deadline} (Статус: {status}, Время: {time})\n"
+#                         else:
+#                             status = await translate_text_to_en(status)
+#                             response += f"- {deadline} (Status: {status}, Time: {time})\n"
 
-                        if diff == 0:
-                            if await check_language_ru(user_id):
-                                await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.create_deadline_status_ru(id))
-                            else:
-                                await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.create_deadline_status_en(id))
-                        else:
-                            await bot.send_message(chat_id=user_id,text=response)
+#                         if diff == 0:
+#                             if await check_language_ru(user_id):
+#                                 await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.create_deadline_status_ru(id))
+#                             else:
+#                                 await bot.send_message(chat_id=user_id,text=response,reply_markup=kb.create_deadline_status_en(id))
+#                         else:
+#                             await bot.send_message(chat_id=user_id,text=response)
 
 async def send_reminders_statistic():
     curr_time = datetime.now()
@@ -170,27 +170,27 @@ async def send_reminders_statistic():
 # Функция для отправки уведомлений утром списком
 async def send_morning_reminders():
     await send_reminders_task_day_list()
-    await send_reminders_deadline_day_list()
+    # await send_reminders_deadline_day_list()
 
 # Функция для отправки уведомлений за час до начала задачи
 async def send_reminders_1_hour_before():
     await send_reminders_task(60)
-    await send_reminders_deadline(60)
+    # await send_reminders_deadline(60)
 
 # Функция для отправки уведомлений за 30 минут до начала задачи
 async def send_reminders_30_minutes_before():
     await send_reminders_task(30)
-    await send_reminders_deadline(30)
+    # await send_reminders_deadline(30)
 
 # Функция для отправки уведомлений за 15 минут до начала задачи
 async def send_reminders_15_minutes_before():
     await send_reminders_task(15)
-    await send_reminders_deadline(15)
+    # await send_reminders_deadline(15)
 
 # Функция для отправки уведомлений в момент начала задачи
 async def send_reminders_at_start():
     await send_reminders_task(0)
-    await send_reminders_deadline(0)
+    # await send_reminders_deadline(0)
 
 # Функция для отправки уведомлений вечером статистика
 async def send_evening_reminders():

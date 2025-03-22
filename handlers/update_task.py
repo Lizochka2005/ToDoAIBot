@@ -8,7 +8,6 @@ from aiogram import Router
 from speech_functions import *
 from states import TaskUpdate, Registration
 import keyboards as kb
-from datetime import datetime
 
 update_task = Router()
 
@@ -31,17 +30,11 @@ async def update_task_cmd(message: Message, state: FSMContext):
         response = await language_text(user_id, response)
         response += '\n'
         for task_id, task, date, time, status in tasks:
-            date = datetime.strptime(date, '%Y-%m-%d')
-            formatted_date = date.strftime('%d %B %Y')
-            if await check_language_ru(message.from_user.id):
-                date = formatted_date.split(' ')
-                month = await language_text(message.from_user.id, date[1])
-                formatted_date = f'{date[0]} {month} {date[-1]}'
             if await check_language_ru(user_id):
-                response += f"{task_id}. {task} (Дата: {formatted_date}, Время: {time}, Статус: {status})\n"
+                response += f"{task_id}. {task} (Дата: {date}, Время: {time}, Статус: {status})\n"
             else:
                 status = await translate_text_to_en(status)
-                response += f"{task_id}. {task} (Date: {formatted_date}, Time: {time}, Status: {status})\n"
+                response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
 
         text = "Enter the number of task which you want to update:"
         text = await language_text(user_id, text)
@@ -122,17 +115,11 @@ async def set_new_time_for_task(message: Message, state: FSMContext):
         response = await language_text(user_id, response)
         response += '\n'
         for task_id, task, date, time, status in tasks:
-            date = datetime.strptime(date, '%Y-%m-%d')
-            formatted_date = date.strftime('%d %B %Y')
-            if await check_language_ru(message.from_user.id):
-                date = formatted_date.split(' ')
-                month = await language_text(message.from_user.id, date[1])
-                formatted_date = f'{date[0]} {month} {date[-1]}'
             if await check_language_ru(user_id):
-                    response += f"{task_id}. {task} (Дата: {formatted_date}, Время: {time}, Статус: {status})\n"
+                    response += f"{task_id}. {task} (Дата: {date}, Время: {time}, Статус: {status})\n"
             else:
                 status = await translate_text_to_en(status)
-                response += f"{task_id}. {task} (Date: {formatted_date}, Time: {time}, Status: {status})\n"
+                response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
 
         await message.answer(response)
     await state.clear()
@@ -142,7 +129,7 @@ async def set_new_time_for_task(message: Message, state: FSMContext):
 @update_task.message(TaskUpdate.waiting_for_new_date)
 async def set_new_date_for_task(message: Message, state: FSMContext):
     user_data = await state.get_data()
-    date = user_data['data']
+    date = user_data['date']
     user_id = user_data['user_id']
     id = user_data["task_id"]
 
@@ -164,17 +151,11 @@ async def set_new_date_for_task(message: Message, state: FSMContext):
         response = await language_text(user_id, response)
         response += '\n'
         for task_id, task, date, time, status in tasks:
-            date = datetime.strptime(date, '%Y-%m-%d')
-            formatted_date = date.strftime('%d %B %Y')
             if await check_language_ru(user_id):
-                date = formatted_date.split(' ')
-                month = await language_text(user_id, date[1])
-                formatted_date = f'{date[0]} {month} {date[-1]}'
-            if await check_language_ru(user_id):
-                response += f"{task_id}. {task} (Дата: {formatted_date}, Время: {time}, Статус: {status})\n"
+                response += f"{task_id}. {task} (Дата: {date}, Время: {time}, Статус: {status})\n"
             else:
                 status = await translate_text_to_en(status)
-                response += f"{task_id}. {task} (Date: {formatted_date}, Time: {time}, Status: {status})\n"
+                response += f"{task_id}. {task} (Date: {date}, Time: {time}, Status: {status})\n"
 
         await message.answer(response)
     await state.clear()

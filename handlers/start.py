@@ -28,10 +28,7 @@ async def start_cmd(message: Message, state: FSMContext):
                 text2 = await language_text(user_id, text2)
                 text = text1 + " " + user[0] + '! ' + text2
                 await message.answer(text)
-                if await check_language_ru(message.from_user.id):
-                    await message.answer(kb.show_commands_ru())
-                else:
-                    await message.answer(kb.show_commands_en())
+
     
 @start.message(Registration.waiting_for_language)
 async def process_language(message: Message, state: FSMContext):
@@ -61,14 +58,10 @@ async def process_name(message: Message, state: FSMContext):
         await db.commit()
 
     if await check_language_ru(user_id):
-        text = f"Регестрация завершена! Имя: {name}, Язык: {language}"
+        text = f"Регистрация завершена! Имя: {name}, Язык: {language}"
     else:
         text = f"Registration completed! Name: {name}, Language: {language}"
     await message.answer(text)
-    if await check_language_ru(message.from_user.id):
-        await message.answer(kb.show_commands_ru())
-        await state.clear()
-    else:
-        await message.answer(kb.show_commands_en())
-        await state.clear()
+    await state.clear()
+
 
