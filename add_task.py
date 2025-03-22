@@ -59,7 +59,7 @@ async def process_time(message: Message, state: FSMContext):
     time = message.text
     user_data = await state.get_data()
     task = user_data["task"]
-    date = user_data["date"]
+    date = str(user_data["date"])
     time = message.text
     correct_time = True
     try:
